@@ -41,3 +41,19 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.sdf
+CAL_ViagemEuropa.sln
+*.suo
+CAL_ViagemEuropa/CAL_ViagemEuropa.vcxproj
+*.filters
+CAL_ViagemEuropa/Debug/application.obj
+*.log
+CAL_ViagemEuropa/Debug/CAL_ViagemEuropa.tlog/CAL_ViagemEuropa.lastbuildstate
+*.tlog
+*.obj
+*.opensdf
+*.idb
+CAL_ViagemEuropa/Debug/vc120.pdb
+*.exe
+Debug/CAL_ViagemEuropa.ilk
+*.pdb
