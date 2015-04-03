@@ -7,12 +7,14 @@ using namespace std;
 class City{
 	private:
 		string name;
-		int lat;
-		int lon;
+		double lat;
+		double lon;
+		int pleasure;
 	
 	public:
-		City(string name, int lat, int lon);
+		City(string name, int pleasure);
 		string getName();
 		int getLat();
 		int getLon();
+		int getPleasure();
 };

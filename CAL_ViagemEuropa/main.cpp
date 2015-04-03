@@ -1,7 +1,13 @@
-#include "requests.h"
+//#include "requests.h"
+#include "application.h"
 
 
-int main()
+int main(){
+	Application app;
+	return 0;
+}
+
+/*int main()
 {
 	string src, dst;
 	double latSrc, latDst, lonSrc, lonDst, timeTravel;
@@ -20,4 +26,4 @@ int main()
 
 	system("PAUSE");
 	return 0; 
-}
+}*/
