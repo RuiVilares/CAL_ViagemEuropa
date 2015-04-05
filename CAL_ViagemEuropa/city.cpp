@@ -10,18 +10,39 @@ City::City(string name, int pleasure){
 	this->pleasure = pleasure;
 }
 
+City::City(string name, double lat, double lon, int pleasure){
+	this->name = name;
+	this->lat = lat;
+	this->lon = lon;
+	this->pleasure = pleasure;
+}
+
 string City::getName(){
 	return this->name;
 }
 
-int City::getLat(){
+double City::getLat(){
 	return this->lat;
 }
 
-int City::getLon(){
+double City::getLon(){
 	return this->lon;
 }
 
 int City::getPleasure(){
 	return this->pleasure;
+}
+
+bool City::operator <(const City city){
+	if (name < city.name)
+		return true;
+	else
+		return false;
+}
+
+bool City::operator ==(const City city){
+	if (name == city.name)
+		return true;
+	else
+		return false;
 }

@@ -3,7 +3,7 @@
 Interface *Application::iface = new Interface();
 
 Application::Application(){
-	main();
+	start();
 }
 
 
@@ -21,17 +21,17 @@ void Application::addCity(){
 		iface->drawString("\n\n\tCity didn't found");
 	else
 	{
-		//vector<City *>::iterator it;
-		//it = find(cities.begin(), cities.end(), city);
-		//if (it != cities.end())
+		vector<City *>::iterator it;
+		it = find(cities.begin(), cities.end(), city);
+		if (it == cities.end())
 			cities.push_back(city);
-		//else
-		//	iface->drawString("\n\n\tCity already exists");
+		else
+			iface->drawString("\n\n\tCity already exists");
 	}
 }
 
 void Application::removeCity(){
-	int command;
+	unsigned int command;
 	while(1){
 		TopMenu("REMOVE CITY");
 		for (unsigned int i = 0; i < cities.size(); i++){
@@ -65,6 +65,27 @@ void Application::TopMenu(string name)
 	iface->drawString("\n\n\n\n");
 }
 
+
+void Application::start(){
+	while (1){
+		char command;
+		TopMenu("WELCOME");
+		iface->drawString("Do you want load a cities configuration?\n\n");
+		iface->drawString("a. Yes\n");
+		iface->drawString("b. No\n\n");
+		iface->drawString("   > ");
+		iface->readChar(command);
+		if (command == 'a'){
+			loadCities();
+			main();
+		}
+		else if (command == 'b'){
+			main();
+		}
+	}
+}
+
+
 void Application::main()
 {
 	while (1){
@@ -74,6 +95,7 @@ void Application::main()
 		iface->drawString("b. Remove city\n");
 		iface->drawString("c. Best route with a limited time\n");
 		iface->drawString("d. Ideal route\n");
+		iface->drawString("e. Save cities\n");
 		iface->drawString("q. Quit(!)\n\n");
 		iface->drawString("   > ");
 		iface->readChar(command);
@@ -89,8 +111,69 @@ void Application::main()
 		else if (command == 'd'){
 			// Branch and Bound
 		}
+		else if (command == 'e'){
+			saveCities();
+		}
 		else if (command == 'q'){
 			return;
 		}
+	}
+}
+
+void Application::saveCities(){
+	while (1){
+		string file;
+		TopMenu("SAVE CITIES");
+		iface->drawString("r. Quit\n\n");
+		iface->drawString("Enter file name: ");
+		iface->readLine(file);
+		if (file == "q")
+			return;
+		ofstream myfile;
+		file = "Saves/" + file + ".txt";
+		myfile.open(file);
+		unsigned int i = 0;
+		while (i<cities.size())
+		{
+			myfile << cities[i]->getName() << " " << cities[i]->getLat() << " " << cities[i]->getLon() << " " << cities[i]->getPleasure() << endl;
+			i++;
+		}
+		myfile.close();
+		iface->drawString("\n\n\nCities were sucefully saved.");
+		iface->getInput();
+		return;
+	}
+}
+
+void Application::loadCities(){
+	while (1){
+		string file;
+		TopMenu("LOAD CITIES");
+		iface->drawString("q. Quit\n\n");
+		iface->drawString("Enter file name: ");
+		iface->readLine(file);
+		if (file == "q")
+			return;
+		ifstream myfile;
+		file = "Saves/" + file + ".txt";
+		myfile.open(file);
+		stringstream ss;
+		string line, name;
+		double lat, lon;
+		int pleasure;
+		while (!myfile.eof())
+		{
+			ss.clear();
+			getline(myfile, line);
+			if (line != ""){
+				ss << line;
+				ss >> name >> lat >> lon >> pleasure;
+				cities.push_back(new City(name, pleasure));
+			}
+		}
+		myfile.close();
+		iface->drawString("\n\n\nCities were sucefully loaded.");
+		iface->getInput();
+		return;
 	}
 }

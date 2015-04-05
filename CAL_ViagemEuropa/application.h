@@ -1,7 +1,9 @@
 #pragma once
 
+#include <sstream>
 #include <algorithm>
 #include <vector>
+#include <fstream>
 #include "city.h"
 #include "interface.h"
 
@@ -17,5 +19,9 @@ public:
 	void removeCity();
 	vector<City *> getCities();
 	void TopMenu(string name);
+	void start();
 	void main();
+	void showFiles();
+	void saveCities();
+	void loadCities();
 };
