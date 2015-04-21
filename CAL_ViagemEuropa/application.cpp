@@ -10,13 +10,24 @@ Application::Application(){
 // implementar comparador ==
 void Application::addCity(){
 	string name;
-	int pleasure;
+	int pleasure=-1, hours=-1, minutes=-1;
 	TopMenu("ADD CITY");
 	iface->drawString("City name: ");
 	iface->read(name);
-	iface->drawString("Pleasure of visiting the city: ");
-	iface->read(pleasure);
-	City* city = new City(name, pleasure);
+	while (pleasure <= 0 || pleasure > 10){
+		iface->drawString("Pleasure of visiting the city(1-10): ");
+		iface->read(pleasure);
+	}
+	iface->drawString("How much time do you pretend stay in the city?\n");
+	while (hours < 0){
+		iface->drawString("\tHours: ");
+		iface->read(hours);
+	}
+	while (minutes < 0 || minutes > 60){
+		iface->drawString("\tMinutes: ");
+		iface->read(minutes);
+	}
+	City* city = new City(name, pleasure, hours, minutes);
 	if (city->getLat() == 0.0 || city->getLon() == 0.0)
 		iface->drawString("\n\n\tCity didn't found");
 	else
@@ -82,6 +93,7 @@ void Application::start(){
 		else if (command == 'b'){
 			main();
 		}
+		return;
 	}
 }
 
@@ -107,9 +119,11 @@ void Application::main()
 		}
 		else if (command == 'c') {
 			// Mochila
+			launch();
 		}
 		else if (command == 'd'){
 			// Branch and Bound
+			launch();
 		}
 		else if (command == 'e'){
 			saveCities();
@@ -135,7 +149,7 @@ void Application::saveCities(){
 		unsigned int i = 0;
 		while (i<cities.size())
 		{
-			myfile << cities[i]->getName() << " " << cities[i]->getLat() << " " << cities[i]->getLon() << " " << cities[i]->getPleasure() << endl;
+			myfile << cities[i]->getName() << " " << cities[i]->getLat() << " " << cities[i]->getLon() << " " << cities[i]->getPleasure() << " " << cities[i]->getTime() << endl;
 			i++;
 		}
 		myfile.close();
@@ -160,15 +174,15 @@ void Application::loadCities(){
 		stringstream ss;
 		string line, name;
 		double lat, lon;
-		int pleasure;
+		int pleasure, time;
 		while (!myfile.eof())
 		{
 			ss.clear();
 			getline(myfile, line);
 			if (line != ""){
 				ss << line;
-				ss >> name >> lat >> lon >> pleasure;
-				cities.push_back(new City(name, pleasure));
+				ss >> name >> lat >> lon >> pleasure >> time;
+				cities.push_back(new City(name, lat, lon, pleasure, time));
 			}
 		}
 		myfile.close();
@@ -176,4 +190,8 @@ void Application::loadCities(){
 		iface->getInput();
 		return;
 	}
+}
+
+void Application::launch(){
+	system("start https://www.google.pt/maps");
 }

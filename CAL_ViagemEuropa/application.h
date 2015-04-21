@@ -24,4 +24,5 @@ public:
 	void showFiles();
 	void saveCities();
 	void loadCities();
+	void launch();
 };
