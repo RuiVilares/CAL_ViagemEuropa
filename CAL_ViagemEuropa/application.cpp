@@ -63,6 +63,29 @@ void Application::removeCity(){
 	}
 }
 
+void Application::showCities(){
+	char command;
+	int hour;
+	double min;
+	while (1){
+		TopMenu("SHOW CITIES");
+		iface->drawString("   NAME\t\tLAT\t\tLON\t   PLEASURE\tTIME IN CITY\n");
+		for (unsigned int i = 0; i < cities.size(); i++){
+			iface->drawString("-> " + cities[i]->getName());
+			hour = cities[i]->getTime() / 3600;
+			min = cities[i]->getTime() % 3600;
+			min = (min / 3600)*60;
+			iface->drawString("\t" + to_string(cities[i]->getLat()) + "\t" + to_string(cities[i]->getLon()) + "\t" + to_string(cities[i]->getPleasure()) + "\t" + to_string(hour) + ":" + to_string((int)min));
+			iface->newLine();
+		}
+		iface->drawString("\nq. Return");
+		iface->drawString("\n\n   > ");
+		iface->read(command);
+		if (command == 'q')
+			return;
+	}
+}
+
 vector<City *> Application::getCities(){
 	return this->cities;
 }
@@ -89,11 +112,12 @@ void Application::start(){
 		if (command == 'a'){
 			loadCities();
 			main();
+			return;
 		}
 		else if (command == 'b'){
 			main();
+			return;
 		}
-		return;
 	}
 }
 
@@ -105,9 +129,10 @@ void Application::main()
 		TopMenu("MAIN MENU");
 		iface->drawString("a. Add city\n");
 		iface->drawString("b. Remove city\n");
-		iface->drawString("c. Best route with a limited time\n");
-		iface->drawString("d. Ideal route\n");
-		iface->drawString("e. Save cities\n");
+		iface->drawString("c. Show cities\n");
+		iface->drawString("d. Best route with a limited time\n");
+		iface->drawString("e. Ideal route\n");
+		iface->drawString("f. Save cities\n");
 		iface->drawString("q. Quit(!)\n\n");
 		iface->drawString("   > ");
 		iface->readChar(command);
@@ -117,15 +142,18 @@ void Application::main()
 		else if (command == 'b'){
 			removeCity();
 		}
-		else if (command == 'c') {
+		else if (command == 'c'){
+			showCities();
+		}
+		else if (command == 'd') {
 			// Mochila
 			launch();
 		}
-		else if (command == 'd'){
+		else if (command == 'e'){
 			// Branch and Bound
 			launch();
 		}
-		else if (command == 'e'){
+		else if (command == 'f'){
 			saveCities();
 		}
 		else if (command == 'q'){
@@ -171,6 +199,11 @@ void Application::loadCities(){
 		ifstream myfile;
 		file = "Saves/" + file + ".txt";
 		myfile.open(file);
+		if (!myfile.is_open()){
+			iface->drawString("\n\n\nFile not found!");
+			iface->getInput();
+			continue;
+		}
 		stringstream ss;
 		string line, name;
 		double lat, lon;
@@ -193,5 +226,13 @@ void Application::loadCities(){
 }
 
 void Application::launch(){
-	system("start https://www.google.pt/maps");
+	string url;
+	url = "start http://map.project-osrm.org/?hl=pt\"";
+	unsigned int i = 0;
+	while (i<cities.size())
+	{
+		url += "&loc=" + to_string(cities[i]->getLat()) + "," + to_string(cities[i]->getLon());
+		i++;
+	}
+	system(url.c_str());
 }
