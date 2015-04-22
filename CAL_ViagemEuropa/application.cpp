@@ -32,12 +32,13 @@ void Application::addCity(){
 		iface->drawString("\n\n\tCity didn't found");
 	else
 	{
-		vector<City *>::iterator it;
-		it = find(cities.begin(), cities.end(), city);
-		if (it == cities.end())
-			cities.push_back(city);
-		else
-			iface->drawString("\n\n\tCity already exists");
+		//vector<City *>::iterator it;
+		//it = find(cities.begin(), cities.end(), city);
+		//if (it == cities.end())
+		//	cities.push_back(city);
+		//else
+		//	iface->drawString("\n\n\tCity already exists");
+		cities.addVertex(city);
 	}
 }
 
@@ -45,8 +46,8 @@ void Application::removeCity(){
 	unsigned int command;
 	while(1){
 		TopMenu("REMOVE CITY");
-		for (unsigned int i = 0; i < cities.size(); i++){
-			iface->drawString(to_string(i + 1) + ". " + cities[i]->getName());
+		for (unsigned int i = 0; i < cities.getNumVertex(); i++){
+			iface->drawString(to_string(i + 1) + ". " + cities.getVertexSet()[i]->getInfo()->getName());
 			iface->newLine();
 		}
 		iface->drawString("\n0. Return");
@@ -54,10 +55,10 @@ void Application::removeCity(){
 		iface->read(command);
 		if (command == 0)
 			return;
-		else if (command > 0 && command <= cities.size()){
+		else if (command > 0 && command <= cities.getNumVertex()){
 			TopMenu("REMOVE CITY");
-			iface->drawString("\n\n\n" + cities[command-1]->getName() + " was sucefully removed!!!\n");
-			cities.erase(cities.begin() + (command - 1));
+			iface->drawString("\n\n\n" + cities.getVertexSet()[command-1]->getInfo()->getName() + " was sucefully removed!!!\n");
+			cities.removeVertex(cities.getVertexSet()[command - 1]->getInfo());
 			iface->getInput();
 		}
 	}
@@ -70,12 +71,12 @@ void Application::showCities(){
 	while (1){
 		TopMenu("SHOW CITIES");
 		iface->drawString("   NAME\t\tLAT\t\tLON\t   PLEASURE\tTIME IN CITY\n");
-		for (unsigned int i = 0; i < cities.size(); i++){
-			iface->drawString("-> " + cities[i]->getName());
-			hour = cities[i]->getTime() / 3600;
-			min = cities[i]->getTime() % 3600;
+		for (unsigned int i = 0; i < cities.getNumVertex(); i++){
+			iface->drawString("-> " + cities.getVertexSet()[i]->getInfo()->getName());
+			hour = cities.getVertexSet()[i]->getInfo()->getTime() / 3600;
+			min = cities.getVertexSet()[i]->getInfo()->getTime() % 3600;
 			min = (min / 3600)*60;
-			iface->drawString("\t" + to_string(cities[i]->getLat()) + "\t" + to_string(cities[i]->getLon()) + "\t" + to_string(cities[i]->getPleasure()) + "\t" + to_string(hour) + ":" + to_string((int)min));
+			iface->drawString("\t" + to_string(cities.getVertexSet()[i]->getInfo()->getLat()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo()->getLon()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo()->getPleasure()) + "\t" + to_string(hour) + ":" + to_string((int)min));
 			iface->newLine();
 		}
 		iface->drawString("\nq. Return");
@@ -86,7 +87,7 @@ void Application::showCities(){
 	}
 }
 
-vector<City *> Application::getCities(){
+Graph<City *> Application::getCities(){
 	return this->cities;
 }
 
@@ -175,9 +176,9 @@ void Application::saveCities(){
 		file = "Saves/" + file + ".txt";
 		myfile.open(file);
 		unsigned int i = 0;
-		while (i<cities.size())
+		while (i<cities.getNumVertex())
 		{
-			myfile << cities[i]->getName() << " " << cities[i]->getLat() << " " << cities[i]->getLon() << " " << cities[i]->getPleasure() << " " << cities[i]->getTime() << endl;
+			myfile << cities.getVertexSet()[i]->getInfo()->getName() << " " << cities.getVertexSet()[i]->getInfo()->getLat() << " " << cities.getVertexSet()[i]->getInfo()->getLon() << " " << cities.getVertexSet()[i]->getInfo()->getPleasure() << " " << cities.getVertexSet()[i]->getInfo()->getTime() << endl;
 			i++;
 		}
 		myfile.close();
@@ -215,7 +216,7 @@ void Application::loadCities(){
 			if (line != ""){
 				ss << line;
 				ss >> name >> lat >> lon >> pleasure >> time;
-				cities.push_back(new City(name, lat, lon, pleasure, time));
+				cities.addVertex(new City(name, lat, lon, pleasure, time));
 			}
 		}
 		myfile.close();
@@ -229,10 +230,12 @@ void Application::launch(){
 	string url;
 	url = "start http://map.project-osrm.org/?hl=pt\"";
 	unsigned int i = 0;
-	while (i<cities.size())
+	while (i<cities.getNumVertex())
 	{
-		url += "&loc=" + to_string(cities[i]->getLat()) + "," + to_string(cities[i]->getLon());
+		url += "&loc=" + to_string(cities.getVertexSet()[i]->getInfo()->getLat()) + "," + to_string(cities.getVertexSet()[i]->getInfo()->getLon());
 		i++;
 	}
+	url += "&loc=" + to_string(cities.getVertexSet()[0]->getInfo()->getLat()) + "," + to_string(cities.getVertexSet()[0]->getInfo()->getLon());
+
 	system(url.c_str());
 }
