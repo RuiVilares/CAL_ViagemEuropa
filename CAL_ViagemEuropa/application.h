@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include "requests.h"
 #include <vector>
 #include <fstream>
 #include "city.h"
@@ -18,6 +19,7 @@ public:
 	Application();
 	void addCity();
 	void removeCity();
+	void addConnection();
 	void showCities();
 	Graph<City *> getCities();
 	void TopMenu(string name);

@@ -57,3 +57,4 @@ CAL_ViagemEuropa/Debug/vc120.pdb
 *.exe
 Debug/CAL_ViagemEuropa.ilk
 *.pdb
+*.vcxproj

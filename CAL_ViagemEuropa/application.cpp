@@ -41,6 +41,33 @@ void Application::addCity(){
 		cities.addVertex(city);
 	}
 }
+void Application::addConnection(){
+	string nameSrc;
+	string nameDst;
+	TopMenu("ADD CONNECTION");
+	iface->drawString("Source city: ");
+	iface->read(nameSrc);
+	iface->drawString("Destination city: ");
+	iface->read(nameDst);
+	int citySource = -1;
+	int cityDestination = -1;
+	for (size_t i = 0; i < cities.getNumVertex(); i++)
+	{
+		if (cities.getVertexSet()[i]->getInfo()->getName() == nameSrc)
+		{
+			citySource = i;
+		}
+		else if (cities.getVertexSet()[i]->getInfo()->getName() == nameDst){
+			cityDestination = i;
+		}
+	}
+	if (citySource != -1 && cityDestination != -1){
+		double time = getTravelDuration(cities.getVertexSet()[citySource]->getInfo()->getLat(), cities.getVertexSet()[citySource]->getInfo()->getLon(), cities.getVertexSet()[cityDestination]->getInfo()->getLat(), cities.getVertexSet()[cityDestination]->getInfo()->getLon());
+		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], time);
+		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], time);
+	}
+}
+
 
 void Application::removeCity(){
 	unsigned int command;
@@ -78,6 +105,18 @@ void Application::showCities(){
 			min = (min / 3600)*60;
 			iface->drawString("\t" + to_string(cities.getVertexSet()[i]->getInfo()->getLat()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo()->getLon()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo()->getPleasure()) + "\t" + to_string(hour) + ":" + to_string((int)min));
 			iface->newLine();
+			vector <Edge<City*>> edges = cities.getVertexSet()[i]->getAdj();
+			for (size_t j = 0; j < edges.size(); j++)
+			{
+				double weight = edges[j].getWeight();
+				int hours = (int) weight;
+				int minutes = (weight-hours)*60;
+				stringstream ss;
+				ss << hours << "h" << minutes;
+				iface->drawString("\t|__" + edges[j].getDest()->getInfo()->getName() + " " + ss.str());
+				iface->newLine();
+			}
+
 		}
 		iface->drawString("\nq. Return");
 		iface->drawString("\n\n   > ");
@@ -134,6 +173,7 @@ void Application::main()
 		iface->drawString("d. Best route with a limited time\n");
 		iface->drawString("e. Ideal route\n");
 		iface->drawString("f. Save cities\n");
+		iface->drawString("g. Add conection\n");
 		iface->drawString("q. Quit(!)\n\n");
 		iface->drawString("   > ");
 		iface->readChar(command);
@@ -156,6 +196,9 @@ void Application::main()
 		}
 		else if (command == 'f'){
 			saveCities();
+		}
+		else if (command == 'g'){
+			addConnection();
 		}
 		else if (command == 'q'){
 			return;
