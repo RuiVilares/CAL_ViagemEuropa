@@ -187,7 +187,20 @@ void Application::main()
 			showCities();
 		}
 		else if (command == 'd') {
-			// Mochila
+			string name;
+			TopMenu("MAXIMIZE PLEASURE");
+			iface->drawString("Home city name: ");
+			iface->read(name);
+			City * city = NULL;
+			for (size_t i = 0; i < cities.getNumVertex(); i++)
+			{
+				if (cities.getVertexSet()[i]->getInfo()->getName() == name)
+				{
+					city = cities.getVertexSet()[i]->getInfo();
+				}
+			}
+			if (city != NULL)
+				cities.knapsack(15, city);
 			launch();
 		}
 		else if (command == 'e'){

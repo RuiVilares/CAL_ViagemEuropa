@@ -1,5 +1,6 @@
 //#include "requests.h"
 #include "application.h"
+#include "graphviewer.h"
 
 
 int main(){

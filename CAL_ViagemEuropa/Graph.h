@@ -180,7 +180,6 @@ public:
 	vector<Vertex<T> * > getVertexSet() const;
 	int getNumVertex() const;
 
-	//exercicio 5
 	Vertex<T>* getVertex(const T &v) const;
 	void resetIndegrees();
 	vector<Vertex<T>*> getSources() const;
@@ -190,7 +189,8 @@ public:
 	void unweightedShortestPath(const T &v);
 	bool isDAG();
 
-	//exercicio 6
+
+	vector<T> knapsack(unsigned int maxTime, T src);
 	void bellmanFordShortestPath(const T &s);
 	void dijkstraShortestPath(const T &s);
 	void floydWarshallShortestPath();
@@ -758,6 +758,35 @@ void Graph<T>::floydWarshallShortestPath() {
 				}
 			}
 
+}
+template <class T>
+vector<T> Graph<T>::knapsack(unsigned int maxTime, T src){
+	vector<T> retorno;
+	cout << maxTime << endl;
+	if (maxTime == 0){
+		return retorno;
+	}
+	double * weight = (double*)malloc(maxTime);
+	double * best = (double*)malloc(maxTime);
+		for (size_t j = 0; j < maxTime; j++){
+			cost[j] = 0;
+			best[j] = 0;
+		}
+		/*
+		for (size_t i = 1; i <= vertexSet.size(); j++){
+			for (size_t j = 0; j <= maxTime; j++){
+				if (!(src == vertexSet[i - 1]->getInfo()) && vertexSet[i - 1]->getInfo()->getTime() < j){
+					int pleasure = m[i - 1, j - vertexSet[i - 1]->getInfo()->getTime()] + vertexSet[i - 1]->getInfo()->getPleasure();
+					if (m[i - 1, j] < pleasure){
+						m[i, j] = pleasure;
+					}
+				}
+				else{
+					m[i, j] = m[i - 1, j];
+				}
+			}
+		}*/
+	return retorno;
 }
 
 
