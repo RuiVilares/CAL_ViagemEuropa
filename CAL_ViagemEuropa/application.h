@@ -8,12 +8,16 @@
 #include "city.h"
 #include "interface.h"
 #include "Graph.h"
+#include "graphviewer/graphviewer.h"
 
 using namespace std;
 
 class Application{
 private:
 	Graph<City *> cities;
+	GraphViewer *gv;
+	int lastNode;
+	int lastEdge;
 public:
 	static Interface *iface;
 	Application();
@@ -29,4 +33,6 @@ public:
 	void saveCities();
 	void loadCities();
 	void launch();
+	int calcX(double lon);
+	int calcY(double lat);
 };
