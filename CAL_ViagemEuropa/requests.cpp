@@ -36,8 +36,12 @@ void getLatLong(string const &name, double &lat, double &lon)
 
 int getTravelDuration(double const &latSrc, double const &lonSrc, double const &latDst, double const &lonDst)
 {
+	stringstream latS; latS << setprecision(3) << latSrc;
+	stringstream lonS; lonS << setprecision(3) << lonSrc;
+	stringstream latD; latD << setprecision(3) << latDst;
+	stringstream lonD; lonD << setprecision(3) << lonDst;
 	// prepare session
-	URI uri("http://osrm.mapzen.com/car/viaroute?loc=" + to_string(latSrc) + "," + to_string(lonSrc) + "&loc=" + to_string(latDst) + "," + to_string(lonDst));
+	URI uri("http://osrm.mapzen.com/car/viaroute?loc=" + latS.str() + "," + lonS.str() + "&loc=" + latD.str() + "," + lonD.str());
 	HTTPClientSession session(uri.getHost(), uri.getPort());
 
 	// prepare path
@@ -66,5 +70,5 @@ int getTravelDuration(double const &latSrc, double const &lonSrc, double const &
 
 
 	// CORRIGIR OS 0.9 e as HORAS
-	return ((stoi(test.toString())*0.9)); // val holds "value"
+	return ((stoi(test.toString())*0.8)); // val holds "value"
 }
