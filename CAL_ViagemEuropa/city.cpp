@@ -3,7 +3,7 @@
 
 City::City(string name, int pleasure, int hours, int minutes){
 	this->name = name;
-	this->time = hours * 3600 + minutes * 60;
+	this->time = hours * 60 + minutes;
 	double lat=0, lon=0;
 	getLatLong(name, lat, lon);
 	this->lat = lat;
@@ -37,6 +37,9 @@ int City::getPleasure(){
 
 int City::getTime(){
 	return this->time;
+}
+double City::getTimeInHours(){
+	return (double)time/60.0;
 }
 
 bool City::operator <(const City city){

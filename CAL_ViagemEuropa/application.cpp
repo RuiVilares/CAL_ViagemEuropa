@@ -27,17 +27,11 @@ void Application::addCity(){
 		iface->drawString("\tMinutes: ");
 		iface->read(minutes);
 	}
-	City* city = new City(name, pleasure, hours, minutes);
-	if (city->getLat() == 0.0 || city->getLon() == 0.0)
+	City city = City(name, pleasure, hours, minutes);
+	if (city.getLat() == 0.0 || city.getLon() == 0.0)
 		iface->drawString("\n\n\tCity didn't found");
 	else
 	{
-		//vector<City *>::iterator it;
-		//it = find(cities.begin(), cities.end(), city);
-		//if (it == cities.end())
-		//	cities.push_back(city);
-		//else
-		//	iface->drawString("\n\n\tCity already exists");
 		cities.addVertex(city);
 	}
 }
@@ -53,16 +47,16 @@ void Application::addConnection(){
 	int cityDestination = -1;
 	for (size_t i = 0; i < cities.getNumVertex(); i++)
 	{
-		if (cities.getVertexSet()[i]->getInfo()->getName() == nameSrc)
+		if (cities.getVertexSet()[i]->getInfo().getName() == nameSrc)
 		{
 			citySource = i;
 		}
-		else if (cities.getVertexSet()[i]->getInfo()->getName() == nameDst){
+		else if (cities.getVertexSet()[i]->getInfo().getName() == nameDst){
 			cityDestination = i;
 		}
 	}
 	if (citySource != -1 && cityDestination != -1){
-		double time = getTravelDuration(cities.getVertexSet()[citySource]->getInfo()->getLat(), cities.getVertexSet()[citySource]->getInfo()->getLon(), cities.getVertexSet()[cityDestination]->getInfo()->getLat(), cities.getVertexSet()[cityDestination]->getInfo()->getLon());
+		double time = getTravelDuration(cities.getVertexSet()[citySource]->getInfo().getLat(), cities.getVertexSet()[citySource]->getInfo().getLon(), cities.getVertexSet()[cityDestination]->getInfo().getLat(), cities.getVertexSet()[cityDestination]->getInfo().getLon());
 		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], time);
 		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], time);
 	}
@@ -74,7 +68,7 @@ void Application::removeCity(){
 	while(1){
 		TopMenu("REMOVE CITY");
 		for (unsigned int i = 0; i < cities.getNumVertex(); i++){
-			iface->drawString(to_string(i + 1) + ". " + cities.getVertexSet()[i]->getInfo()->getName());
+			iface->drawString(to_string(i + 1) + ". " + cities.getVertexSet()[i]->getInfo().getName());
 			iface->newLine();
 		}
 		iface->drawString("\n0. Return");
@@ -84,7 +78,7 @@ void Application::removeCity(){
 			return;
 		else if (command > 0 && command <= cities.getNumVertex()){
 			TopMenu("REMOVE CITY");
-			iface->drawString("\n\n\n" + cities.getVertexSet()[command-1]->getInfo()->getName() + " was sucefully removed!!!\n");
+			iface->drawString("\n\n\n" + cities.getVertexSet()[command-1]->getInfo().getName() + " was sucefully removed!!!\n");
 			cities.removeVertex(cities.getVertexSet()[command - 1]->getInfo());
 			iface->getInput();
 		}
@@ -99,13 +93,12 @@ void Application::showCities(){
 		TopMenu("SHOW CITIES");
 		iface->drawString("   NAME\t\tLAT\t\tLON\t   PLEASURE\tTIME IN CITY\n");
 		for (unsigned int i = 0; i < cities.getNumVertex(); i++){
-			iface->drawString("-> " + cities.getVertexSet()[i]->getInfo()->getName());
-			hour = cities.getVertexSet()[i]->getInfo()->getTime() / 3600;
-			min = cities.getVertexSet()[i]->getInfo()->getTime() % 3600;
-			min = (min / 3600)*60;
-			iface->drawString("\t" + to_string(cities.getVertexSet()[i]->getInfo()->getLat()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo()->getLon()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo()->getPleasure()) + "\t" + to_string(hour) + ":" + to_string((int)min));
+			iface->drawString("-> " + cities.getVertexSet()[i]->getInfo().getName());
+			hour = cities.getVertexSet()[i]->getInfo().getTime()/60;
+			min = cities.getVertexSet()[i]->getInfo().getTime() % 60;
+			iface->drawString("\t" + to_string(cities.getVertexSet()[i]->getInfo().getLat()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo().getLon()) + "\t" + to_string(cities.getVertexSet()[i]->getInfo().getPleasure()) + "\t" + to_string(hour) + ":" + to_string((int)min));
 			iface->newLine();
-			vector <Edge<City*>> edges = cities.getVertexSet()[i]->getAdj();
+			vector <Edge<City>> edges = cities.getVertexSet()[i]->getAdj();
 			for (size_t j = 0; j < edges.size(); j++)
 			{
 				double weight = edges[j].getWeight();
@@ -113,7 +106,7 @@ void Application::showCities(){
 				int minutes = (weight-hours)*60;
 				stringstream ss;
 				ss << hours << "h" << minutes;
-				iface->drawString("\t|__" + edges[j].getDest()->getInfo()->getName() + " " + ss.str());
+				iface->drawString("\t|__" + edges[j].getDest()->getInfo().getName() + " " + ss.str());
 				iface->newLine();
 			}
 
@@ -126,7 +119,7 @@ void Application::showCities(){
 	}
 }
 
-Graph<City *> Application::getCities(){
+Graph<City> Application::getCities(){
 	return this->cities;
 }
 
@@ -191,17 +184,26 @@ void Application::main()
 			TopMenu("MAXIMIZE PLEASURE");
 			iface->drawString("Home city name: ");
 			iface->read(name);
-			City * city = NULL;
+			City city("nulo",0,0,0);
 			for (size_t i = 0; i < cities.getNumVertex(); i++)
 			{
-				if (cities.getVertexSet()[i]->getInfo()->getName() == name)
+				if (cities.getVertexSet()[i]->getInfo().getName() == name)
 				{
 					city = cities.getVertexSet()[i]->getInfo();
 				}
 			}
-			if (city != NULL)
-				cities.knapsack(15, city);
-			launch();
+			int totalTime;
+			iface->drawString("Total time: ");
+			iface->read(totalTime);
+			vector<City > route;
+			if (city.getName() != "nulo")
+				route = cities.knapsack(totalTime, city);
+			for (size_t i = 0; i < route.size(); i++){
+				iface->drawString(route[i].getName());
+				iface->drawString("\n");
+			}
+			system("pause");
+			//launch();
 		}
 		else if (command == 'e'){
 			// Branch and Bound
@@ -234,7 +236,7 @@ void Application::saveCities(){
 		unsigned int i = 0;
 		while (i<cities.getNumVertex())
 		{
-			myfile << cities.getVertexSet()[i]->getInfo()->getName() << " " << cities.getVertexSet()[i]->getInfo()->getLat() << " " << cities.getVertexSet()[i]->getInfo()->getLon() << " " << cities.getVertexSet()[i]->getInfo()->getPleasure() << " " << cities.getVertexSet()[i]->getInfo()->getTime() << endl;
+			myfile << cities.getVertexSet()[i]->getInfo().getName() << " " << cities.getVertexSet()[i]->getInfo().getLat() << " " << cities.getVertexSet()[i]->getInfo().getLon() << " " << cities.getVertexSet()[i]->getInfo().getPleasure() << " " << cities.getVertexSet()[i]->getInfo().getTime() << endl;
 			i++;
 		}
 		myfile.close();
@@ -272,7 +274,7 @@ void Application::loadCities(){
 			if (line != ""){
 				ss << line;
 				ss >> name >> lat >> lon >> pleasure >> time;
-				cities.addVertex(new City(name, lat, lon, pleasure, time));
+				cities.addVertex(City(name, lat, lon, pleasure, time));
 			}
 		}
 		myfile.close();
@@ -288,10 +290,10 @@ void Application::launch(){
 	unsigned int i = 0;
 	while (i<cities.getNumVertex())
 	{
-		url += "&loc=" + to_string(cities.getVertexSet()[i]->getInfo()->getLat()) + "," + to_string(cities.getVertexSet()[i]->getInfo()->getLon());
+		url += "&loc=" + to_string(cities.getVertexSet()[i]->getInfo().getLat()) + "," + to_string(cities.getVertexSet()[i]->getInfo().getLon());
 		i++;
 	}
-	url += "&loc=" + to_string(cities.getVertexSet()[0]->getInfo()->getLat()) + "," + to_string(cities.getVertexSet()[0]->getInfo()->getLon());
+	url += "&loc=" + to_string(cities.getVertexSet()[0]->getInfo().getLat()) + "," + to_string(cities.getVertexSet()[0]->getInfo().getLon());
 
 	system(url.c_str());
 }

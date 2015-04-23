@@ -20,6 +20,7 @@ class City{
 		double getLon();
 		int getPleasure();
 		int getTime();
+		double getTimeInHours();
 		bool operator <(const City city);
 		bool operator ==(const City city);
 };

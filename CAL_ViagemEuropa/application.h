@@ -13,7 +13,7 @@ using namespace std;
 
 class Application{
 private:
-	Graph<City *> cities;
+	Graph<City> cities;
 public:
 	static Interface *iface;
 	Application();
@@ -21,7 +21,7 @@ public:
 	void removeCity();
 	void addConnection();
 	void showCities();
-	Graph<City *> getCities();
+	Graph<City> getCities();
 	void TopMenu(string name);
 	void start();
 	void main();

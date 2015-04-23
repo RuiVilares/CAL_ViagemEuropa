@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Graph.h
  */
 #ifndef GRAPH_H_
@@ -81,7 +81,7 @@ vector<Edge<T>> Vertex<T>::getAdj(){
 	return adj;
 }
 
-//atualizado pelo exercício 5
+//atualizado pelo exercÃ­cio 5
 template <class T>
 Vertex<T>::Vertex(T in): info(in), visited(false), processing(false), indegree(0), dist(0) {
 	path = NULL;
@@ -190,7 +190,7 @@ public:
 	bool isDAG();
 
 
-	vector<T> knapsack(unsigned int maxTime, T src);
+	vector<T> knapsack(unsigned int maxTime, T &src);
 	void bellmanFordShortestPath(const T &s);
 	void dijkstraShortestPath(const T &s);
 	void floydWarshallShortestPath();
@@ -453,7 +453,7 @@ vector<T> Graph<T>::topologicalOrder() {
 	//vetor com o resultado da ordenacao
 	vector<T> res;
 
-	//verificar se é um DAG
+	//verificar se Ã© um DAG
 	if( getNumCycles() > 0 ) {
 		cout << "Ordenacao Impossivel!" << endl;
 		return res;
@@ -668,7 +668,7 @@ void Graph<T>::dijkstraShortestPath(const T &s) {
 				w->dist = v->dist + v->adj[i].weight;
 				w->path = v;
 
-				//se já estiver na lista, apenas a actualiza
+				//se jÃ¡ estiver na lista, apenas a actualiza
 				if(!w->processing)
 				{
 					w->processing = true;
@@ -746,7 +746,7 @@ void Graph<T>::floydWarshallShortestPath() {
 		for(unsigned int i = 0; i < vertexSet.size(); i++)
 			for(unsigned int j = 0; j < vertexSet.size(); j++)
 			{
-				//se somarmos qualquer coisa ao valor INT_INFINITY, ocorre overflow, o que resulta num valor negativo, logo nem convém considerar essa soma
+				//se somarmos qualquer coisa ao valor INT_INFINITY, ocorre overflow, o que resulta num valor negativo, logo nem convÃ©m considerar essa soma
 				if(W[i][k] == INT_INFINITY || W[k][j] == INT_INFINITY)
 					continue;
 
@@ -757,36 +757,53 @@ void Graph<T>::floydWarshallShortestPath() {
 					P[i][j] = k;
 				}
 			}
-
 }
+/*
+nedds to be a city graph or the type has to have the methods getTimeInHours() and getPleasure()
+*/
 template <class T>
-vector<T> Graph<T>::knapsack(unsigned int maxTime, T src){
-	vector<T> retorno;
-	cout << maxTime << endl;
-	if (maxTime == 0){
-		return retorno;
-	}
-	double * weight = (double*)malloc(maxTime);
-	double * best = (double*)malloc(maxTime);
-		for (size_t j = 0; j < maxTime; j++){
-			cost[j] = 0;
-			best[j] = 0;
+vector<T> Graph<T>::knapsack(unsigned int maxTime, T& src){
+		vector<T> retorno;
+		if (maxTime == 0){
+			return retorno;
 		}
-		/*
-		for (size_t i = 1; i <= vertexSet.size(); j++){
+		int** totalP = new int*[getNumVertex() + 1];
+		for (int i = 0; i < getNumVertex() + 1; ++i)
+			totalP[i] = new int[maxTime + 1];
+
+
+		for (size_t j = 0; j <= maxTime; j++)
+			totalP[0][j] = 0;
+
+
+		for (size_t i = 1; i <= vertexSet.size(); i++){
 			for (size_t j = 0; j <= maxTime; j++){
-				if (!(src == vertexSet[i - 1]->getInfo()) && vertexSet[i - 1]->getInfo()->getTime() < j){
-					int pleasure = m[i - 1, j - vertexSet[i - 1]->getInfo()->getTime()] + vertexSet[i - 1]->getInfo()->getPleasure();
-					if (m[i - 1, j] < pleasure){
-						m[i, j] = pleasure;
-					}
-				}
+				if (!(src == vertexSet[i - 1]->getInfo()) && vertexSet[i - 1]->getInfo().getTimeInHours() < (double)j){
+					int index = (j - round(vertexSet[i - 1]->getInfo().getTimeInHours()));
+					int pleasure = vertexSet[i - 1]->getInfo().getPleasure() + totalP[i - 1][index];
+					if (totalP[i - 1][j] >= pleasure)
+						totalP[i][j] = totalP[i - 1][j];
+					else
+						totalP[i][j] = pleasure;
+				}	
 				else{
-					m[i, j] = m[i - 1, j];
+					totalP[i][j] = totalP[i - 1][j];
 				}
 			}
-		}*/
-	return retorno;
+		}
+
+		int i = getNumVertex();
+		int k = maxTime;
+		while (i > 0 && k > 0){
+			if (totalP[i][k] != totalP[i - 1][k]){
+				retorno.push_back(vertexSet[i - 1]->getInfo());
+				k -= round(vertexSet[i - 1]->getInfo().getTimeInHours());
+				i--;
+			}
+			else
+				i--;
+		}
+		return retorno;
 }
 
 
