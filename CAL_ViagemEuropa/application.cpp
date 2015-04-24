@@ -335,7 +335,7 @@ void Application::loadCities(){
 					{
 						citySource = i;
 					}
-					else if (cities.getVertexSet()[i]->getInfo()->getName() == dst){
+					else if (cities.getVertexSet()[i]->getInfo().getName() == dst){
 						cityDestination = i;
 					}
 				}
