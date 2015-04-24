@@ -1,8 +1,16 @@
 #include "application.h"
 
+
 Interface *Application::iface = new Interface();
 
 Application::Application(){
+	gv = new GraphViewer(1200, 600, false);
+	//gv->setBackground("Europe.jpg");
+	gv->createWindow(1200, 600);
+	gv->defineVertexColor("blue");
+	gv->defineEdgeColor("black");
+	lastEdge = 0;
+	lastNode = 0;
 	start();
 }
 
@@ -33,6 +41,10 @@ void Application::addCity(){
 	else
 	{
 		cities.addVertex(city);
+		gv->addNode(lastNode, calcX(city.getLon()), calcY(city.getLat()));
+		gv->setVertexLabel(lastNode, city.getName());
+		gv->rearrange();
+		lastNode++;
 	}
 }
 void Application::addConnection(){
@@ -56,10 +68,22 @@ void Application::addConnection(){
 		}
 	}
 	if (citySource != -1 && cityDestination != -1){
-		double time = getTravelDuration(cities.getVertexSet()[citySource]->getInfo().getLat(), cities.getVertexSet()[citySource]->getInfo().getLon(), cities.getVertexSet()[cityDestination]->getInfo().getLat(), cities.getVertexSet()[cityDestination]->getInfo().getLon());
-		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], time);
-		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], time);
+		int time = getTravelDuration(cities.getVertexSet()[citySource]->getInfo().getLat(), cities.getVertexSet()[citySource]->getInfo().getLon(), cities.getVertexSet()[cityDestination]->getInfo().getLat(), cities.getVertexSet()[cityDestination]->getInfo().getLon());
+		int hour;
+		double min;
+		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], (double)time/60.0);
+		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], (double)time/60.0);
+		gv->addEdge(lastEdge,citySource, cityDestination, EdgeType::UNDIRECTED);
+		hour = time / 3600;
+		min = time % 3600;
+		min = (min / 3600) * 60;
+		gv->setEdgeLabel(lastEdge, to_string(hour) + ":" + to_string(int(min)));
+		gv->rearrange();
+		lastEdge++;
+		return;
 	}
+	iface->drawString("\n\n\tCity didn't found");
+	iface->getInput();
 }
 
 
@@ -239,6 +263,21 @@ void Application::saveCities(){
 			myfile << cities.getVertexSet()[i]->getInfo().getName() << " " << cities.getVertexSet()[i]->getInfo().getLat() << " " << cities.getVertexSet()[i]->getInfo().getLon() << " " << cities.getVertexSet()[i]->getInfo().getPleasure() << " " << cities.getVertexSet()[i]->getInfo().getTime() << endl;
 			i++;
 		}
+		i = 0;
+		myfile << "#" << endl;
+		vector<string>names;
+		while (i<cities.getNumVertex())
+		{
+			unsigned int j = 0;
+			while (j < cities.getVertexSet()[i]->getAdj().size()){
+				if (find(names.begin(), names.end(), cities.getVertexSet()[i]->getAdj()[j].getDest()->getInfo().getName()) == names.end()){
+					myfile << cities.getVertexSet()[i]->getInfo().getName() << " " << cities.getVertexSet()[i]->getAdj()[j].getDest()->getInfo().getName() << " " << cities.getVertexSet()[i]->getAdj()[j].getWeight() << endl;
+				}
+				names.push_back(cities.getVertexSet()[i]->getInfo().getName());
+				j++;
+			}
+			i++;
+		}
 		myfile.close();
 		iface->drawString("\n\n\nCities were sucefully saved.");
 		iface->getInput();
@@ -264,17 +303,55 @@ void Application::loadCities(){
 			continue;
 		}
 		stringstream ss;
-		string line, name;
+		string line = "", name, src, dst;
 		double lat, lon;
-		int pleasure, time;
+		int pleasure, time, duration;
+		while (!myfile.eof() && line !="#")
+		{
+			ss.clear();
+			getline(myfile, line);
+			if (line != "" && line != "#"){
+				ss << line;
+				ss >> name >> lat >> lon >> pleasure >> time;
+				cities.addVertex(City(name, lat, lon, pleasure, time));
+				gv->addNode(lastNode, calcX(lon), calcY(lat));
+				gv->setVertexLabel(lastNode, name);
+				gv->rearrange();
+				lastNode++;
+			}
+		}
 		while (!myfile.eof())
 		{
 			ss.clear();
 			getline(myfile, line);
 			if (line != ""){
 				ss << line;
-				ss >> name >> lat >> lon >> pleasure >> time;
-				cities.addVertex(City(name, lat, lon, pleasure, time));
+				ss >> src >> dst >> duration;
+				int citySource = -1;
+				int cityDestination = -1;
+				for (size_t i = 0; i < cities.getNumVertex(); i++)
+				{
+					if (cities.getVertexSet()[i]->getInfo().getName() == src)
+					{
+						citySource = i;
+					}
+					else if (cities.getVertexSet()[i]->getInfo()->getName() == dst){
+						cityDestination = i;
+					}
+				}
+				if (citySource != -1 && cityDestination != -1){
+					int hour;
+					double min;
+					cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], duration);
+					cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], duration);
+					gv->addEdge(lastEdge, citySource, cityDestination, EdgeType::UNDIRECTED);
+					hour = duration / 3600;
+					min = duration % 3600;
+					min = (min / 3600) * 60;
+					gv->setEdgeLabel(lastEdge, to_string(hour) + ":" + to_string(int(min)));
+					gv->rearrange();
+					lastEdge++;
+				}
 			}
 		}
 		myfile.close();
@@ -296,4 +373,15 @@ void Application::launch(){
 	url += "&loc=" + to_string(cities.getVertexSet()[0]->getInfo().getLat()) + "," + to_string(cities.getVertexSet()[0]->getInfo().getLon());
 
 	system(url.c_str());
+}
+
+int Application::calcX(double lon){
+	int aux;
+	aux = ((lon + 10) * 1200) / 70;
+	return aux;
+}
+int Application::calcY(double lat){
+	int aux;
+	aux = 600-(((lat - 35) * 600) / 35);
+	return aux;
 }

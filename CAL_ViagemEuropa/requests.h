@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 using namespace Poco::Net;
 using namespace Poco;
@@ -25,4 +26,4 @@ using namespace Poco::JSON;
 
 void getLatLong(string const &name, double &lat, double &lon);
 
-double getTravelDuration(double const &latSrc, double const &lonSrc, double const &latDst, double const &lonDst);
+int getTravelDuration(double const &latSrc, double const &lonSrc, double const &latDst, double const &lonDst);
