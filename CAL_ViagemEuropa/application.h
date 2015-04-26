@@ -29,6 +29,7 @@ public:
 	void TopMenu(string name);
 	void start();
 	void main();
+	void limitedTimeRoute();
 	//void showFiles();
 	void saveCities();
 	void loadCities();

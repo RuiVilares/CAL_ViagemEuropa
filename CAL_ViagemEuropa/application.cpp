@@ -177,6 +177,56 @@ void Application::start(){
 		}
 	}
 }
+void Application::limitedTimeRoute(){
+	string name;
+	TopMenu("MAXIMIZE PLEASURE");
+	iface->drawString("Home city name: ");
+	iface->read(name);
+	City city("nulo", 0, 0, 0);
+	for (size_t i = 0; i < cities.getNumVertex(); i++)
+	{
+		if (cities.getVertexSet()[i]->getInfo().getName() == name)
+		{
+			city = cities.getVertexSet()[i]->getInfo();
+		}
+	}
+	int inputTime;
+	double totalTime;
+	iface->drawString("Total time: ");
+	iface->read(inputTime);
+	int time = inputTime;
+	cities.floydWarshallShortestPath();
+	vector<int > route;
+	do{
+		if (city.getName() != "nulo"){
+			cities.knapsack(inputTime, city);
+			route = cities.getKnapsackSolution(time);
+		}
+		totalTime = 0;
+		totalTime += cities.getCityTime(route);
+		for (size_t i = 0; i < route.size() -1; i++)
+		{
+			
+			totalTime += cities.getW(route[i], route[i+1]);
+		}
+		if (totalTime >(double)inputTime){
+			time--;
+		}
+		else{
+			break;
+		}
+	} while (1);
+	for (size_t i = 0; i < route.size(); i++)
+	{
+		if (i != route.size() - 1)
+			cout << route[i] << "-";
+		else
+			cout << route[i];
+		
+	}
+	cout << endl << endl;
+	system("pause");
+}
 
 
 void Application::main()
@@ -204,31 +254,7 @@ void Application::main()
 			showCities();
 		}
 		else if (command == 'd') {
-			string name;
-			TopMenu("MAXIMIZE PLEASURE");
-			iface->drawString("Home city name: ");
-			iface->read(name);
-			City city("nulo",0,0,0);
-			for (size_t i = 0; i < cities.getNumVertex(); i++)
-			{
-				if (cities.getVertexSet()[i]->getInfo().getName() == name)
-				{
-					city = cities.getVertexSet()[i]->getInfo();
-				}
-			}
-			int totalTime;
-			iface->drawString("Total time: ");
-			iface->read(totalTime);
-			vector<City > route;
-			if (city.getName() != "nulo"){
-				cities.knapsack(totalTime, city);
-				route = cities.getKnapsackSolution(totalTime);
-			}
-			for (size_t i = 0; i < route.size(); i++){
-				iface->drawString(route[i].getName());
-				iface->drawString("\n");
-			}
-			system("pause");
+			limitedTimeRoute();
 			//launch();
 		}
 		else if (command == 'e'){
