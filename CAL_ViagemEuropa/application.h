@@ -33,6 +33,7 @@ public:
 	void saveCities();
 	void loadCities();
 	void launch();
+	void idealRoute();
 	int calcX(double lon);
 	int calcY(double lat);
 };

@@ -230,14 +230,7 @@ void Application::main()
 			//launch();
 		}
 		else if (command == 'e'){
-			cities.BB_TSP();
-			if (cities.getHamiltonPath() == ""){
-				cout << "There is no hamilton cycleo" << endl;
-			}
-			else{
-				cout << cities.getHamiltonPath() << endl;
-			}
-			system("pause");
+			idealRoute();
 			//launch();
 		}
 		else if (command == 'f'){
@@ -391,4 +384,23 @@ int Application::calcY(double lat){
 	int aux;
 	aux = 600-(((lat - 35) * 600) / 35);
 	return aux;
+}
+void Application::idealRoute(){
+	cities.BB_TSP();
+	TopMenu("IDEAL ROUTE");
+	if (cities.getHamiltonPath() == ""){
+		cout << "There is no hamilton cycleo" << endl;
+	}
+	else{
+		cout << cities.getHamiltonPath() << endl << endl; // print in a new graph viewer  
+		double totalTime = cities.getTotalCost();
+		for (size_t i = 1; i < cities.getNumVertex(); i++){
+			int hours = cities.getVertexSet()[i]->getInfo().getTimeInHours();
+			int minutes = (int)(cities.getVertexSet()[i]->getInfo().getTimeInHours() - (double)hours) / 60.0;
+			cout << "Time in " << cities.getVertexSet()[i]->getInfo().getName() << ": " << hours << "h" << minutes << endl;
+			totalTime += cities.getVertexSet()[i]->getInfo().getTimeInHours();
+		}
+		cout << endl << "Total time including all car trips: "<< totalTime << endl;
+	}
+	system("pause");
 }
