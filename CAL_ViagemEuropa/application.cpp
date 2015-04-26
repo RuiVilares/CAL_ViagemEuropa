@@ -396,11 +396,14 @@ void Application::idealRoute(){
 		double totalTime = cities.getTotalCost();
 		for (size_t i = 1; i < cities.getNumVertex(); i++){
 			int hours = cities.getVertexSet()[i]->getInfo().getTimeInHours();
-			int minutes = (int)(cities.getVertexSet()[i]->getInfo().getTimeInHours() - (double)hours) / 60.0;
+			double minutes = (cities.getVertexSet()[i]->getInfo().getTimeInHours() - (double)hours) * 60.0;
 			cout << "Time in " << cities.getVertexSet()[i]->getInfo().getName() << ": " << hours << "h" << minutes << endl;
 			totalTime += cities.getVertexSet()[i]->getInfo().getTimeInHours();
 		}
-		cout << endl << "Total time including all car trips: "<< totalTime << endl;
+		int totalhours = totalTime;
+		double totalminutes = (totalTime - (double)totalhours)*60.0;
+		int totalM = (int)totalminutes;
+		cout << endl << "Total time including all car trips: " << totalhours << "h" << totalM << endl;
 	}
 	system("pause");
 }
