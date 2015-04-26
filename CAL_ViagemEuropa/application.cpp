@@ -220,8 +220,10 @@ void Application::main()
 			iface->drawString("Total time: ");
 			iface->read(totalTime);
 			vector<City > route;
-			if (city.getName() != "nulo")
-				route = cities.knapsack(totalTime, city);
+			if (city.getName() != "nulo"){
+				cities.knapsack(totalTime, city);
+				route = cities.getKnapsackSolution(totalTime);
+			}
 			for (size_t i = 0; i < route.size(); i++){
 				iface->drawString(route[i].getName());
 				iface->drawString("\n");
