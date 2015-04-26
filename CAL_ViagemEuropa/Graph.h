@@ -413,9 +413,8 @@ nedds to be a city graph or the type has to have the methods getTimeInHours() an
 */
 template <class T>
 void Graph<T>::knapsack(unsigned int maxTime, T& src){
-		vector<T> retorno;
 		if (maxTime == 0){
-			return retorno;
+			return;
 		}
 		totalP = new int*[getNumVertex() + 1];
 		for (int i = 0; i < getNumVertex() + 1; ++i)
@@ -442,18 +441,6 @@ void Graph<T>::knapsack(unsigned int maxTime, T& src){
 			}
 		}
 
-		int i = getNumVertex();
-		int k = maxTime;
-		while (i > 0 && k > 0){
-			if (totalP[i][k] != totalP[i - 1][k]){
-				retorno.push_back(vertexSet[i - 1]->getInfo());
-				k -= round(vertexSet[i - 1]->getInfo().getTimeInHours());
-				i--;
-			}
-			else
-				i--;
-		}
-		return retorno;
 }
 template<class T>
 vector<T> Graph<T>::getKnapsackSolution(unsigned int maxTime){
