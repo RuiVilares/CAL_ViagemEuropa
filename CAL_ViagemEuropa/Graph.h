@@ -147,6 +147,7 @@ class Graph {
 	int ** P;   //path
 
 	//Branch and bound variables;
+	int** totalP;
 	double ** cost;
 	double maxBound;
 	double totalCost;
@@ -173,7 +174,8 @@ public:
 	void BB_TSP();
 	string getHamiltonPath();
 	double getTotalCost();
-	vector<T> knapsack(unsigned int maxTime, T &src);
+	void knapsack(unsigned int maxTime, T &src);
+	vector<T> getKnapsackSolution(unsigned int maxTime);
 
 	void floydWarshallShortestPath();
 	double edgeCost(int vOrigIndex, int vDestIndex);
@@ -410,12 +412,11 @@ void Graph<T>::floydWarshallShortestPath() {
 nedds to be a city graph or the type has to have the methods getTimeInHours() and getPleasure()
 */
 template <class T>
-vector<T> Graph<T>::knapsack(unsigned int maxTime, T& src){
-		vector<T> retorno;
+void Graph<T>::knapsack(unsigned int maxTime, T& src){
 		if (maxTime == 0){
-			return retorno;
+			return;
 		}
-		int** totalP = new int*[getNumVertex() + 1];
+		totalP = new int*[getNumVertex() + 1];
 		for (int i = 0; i < getNumVertex() + 1; ++i)
 			totalP[i] = new int[maxTime + 1];
 
@@ -440,18 +441,22 @@ vector<T> Graph<T>::knapsack(unsigned int maxTime, T& src){
 			}
 		}
 
-		int i = getNumVertex();
-		int k = maxTime;
-		while (i > 0 && k > 0){
-			if (totalP[i][k] != totalP[i - 1][k]){
-				retorno.push_back(vertexSet[i - 1]->getInfo());
-				k -= round(vertexSet[i - 1]->getInfo().getTimeInHours());
-				i--;
-			}
-			else
-				i--;
+}
+template<class T>
+vector<T> Graph<T>::getKnapsackSolution(unsigned int maxTime){
+	vector<T> retorno;
+	int i = getNumVertex();
+	int k = maxTime;
+	while (i > 0 && k > 0){
+		if (totalP[i][k] != totalP[i - 1][k]){
+			retorno.push_back(vertexSet[i - 1]->getInfo());
+			k -= round(vertexSet[i - 1]->getInfo().getTimeInHours());
+			i--;
 		}
-		return retorno;
+		else
+			i--;
+	}
+	return retorno;
 }
 template<class T>
 void Graph<T>::rowReduction(double ** costP, double &bound){

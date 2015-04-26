@@ -219,8 +219,10 @@ void Application::main()
 			iface->drawString("Total time: ");
 			iface->read(totalTime);
 			vector<City > route;
-			if (city.getName() != "nulo")
-				route = cities.knapsack(totalTime, city);
+			if (city.getName() != "nulo"){
+				cities.knapsack(totalTime, city);
+				route = cities.getKnapsackSolution(totalTime);
+			}
 			result = new GraphViewer(1200, 600, false);
 			result->createWindow(1200, 600);
 			result->addNode(0, calcX(city.getLon()), calcY(city.getLat()));
