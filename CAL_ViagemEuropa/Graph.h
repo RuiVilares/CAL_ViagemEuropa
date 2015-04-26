@@ -5,6 +5,7 @@
 #define GRAPH_H_
 
 #include <vector>
+#include <algorithm>   
 #include <queue>
 #include <list>
 #include <limits>
@@ -28,10 +29,6 @@ template <class T>
 class Vertex {
 	T info;
 	vector<Edge<T>  > adj;
-	bool visited;
-	bool processing;
-	int indegree;
-	double dist;
 public:
 
 	Vertex(T in);
@@ -45,8 +42,6 @@ public:
 
 	vector<Edge<T>> getAdj();
 
-	int getDist() const;
-	int getIndegree() const;
 
 	bool operator<(const Vertex<T> vertex);
 
@@ -64,7 +59,6 @@ struct vertex_greater_than {
 
 template <class T>
 bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
-	d->indegree--; //adicionado do exercicio 5
 	typename vector<Edge<T> >::iterator it= adj.begin();
 	typename vector<Edge<T> >::iterator ite= adj.end();
 	while (it!=ite) {
@@ -81,9 +75,8 @@ vector<Edge<T>> Vertex<T>::getAdj(){
 	return adj;
 }
 
-//atualizado pelo exercício 5
 template <class T>
-Vertex<T>::Vertex(T in): info(in), visited(false), processing(false), indegree(0), dist(0) {
+Vertex<T>::Vertex(T in): info(in) {
 	path = NULL;
 }
 
@@ -100,20 +93,11 @@ T Vertex<T>::getInfo() const {
 	return this->info;
 }
 
-template <class T>
-int Vertex<T>::getDist() const {
-	return this->dist;
-}
 
 
 template <class T>
 void Vertex<T>::setInfo(T info) {
 	this->info = info;
-}
-
-template <class T>
-int Vertex<T>::getIndegree() const {
-	return this->indegree;
 }
 
 
@@ -157,17 +141,13 @@ double Edge<T>::getWeight(){
 template <class T>
 class Graph {
 	vector<Vertex<T> *> vertexSet;
-	void dfs(Vertex<T> *v, vector<T> &res) const;
-
-	//exercicio 5
-	int numCycles;
-	void dfsVisit(Vertex<T> *v);
-	void dfsVisit();
-	void getPathTo(Vertex<T> *origin, list<T> &res);
-
-	//exercicio 6
-	int ** W;   //weight
+	
+	//floydWarshall variables
+	double ** W;   //weight
 	int ** P;   //path
+	//Branch and bound variables;
+	double ** cost;
+	double maxBound;
 
 public:
 	bool addVertex(const T &in);
@@ -183,11 +163,15 @@ public:
 	Vertex<T>* getVertex(const T &v) const;
 	vector<T> getPath(const T &origin, const T &dest);
 
-
+	double bb_aux(int src, int dst, string path, double ** cost2, double bound);
+	void startMaxBound();
+	void rowReduction(double ** costP, double &bound);
+	void columReduction(double ** costP, double &bound);
+	vector<Vertex<T>*> BB_TSP();
 	vector<T> knapsack(unsigned int maxTime, T &src);
 
 	void floydWarshallShortestPath();
-	int edgeCost(int vOrigIndex, int vDestIndex);
+	double edgeCost(int vOrigIndex, int vDestIndex);
 	vector<T> getfloydWarshallPath(const T &origin, const T &dest);
 	void getfloydWarshallPathAux(int index1, int index2, vector<T> & res);
 };
@@ -229,9 +213,6 @@ bool Graph<T>::removeVertex(const T &in) {
 
 			typename vector<Edge<T> >::iterator itAdj= v->adj.begin();
 			typename vector<Edge<T> >::iterator itAdje= v->adj.end();
-			for (; itAdj!=itAdje; itAdj++) {
-				itAdj->dest->indegree--;
-			}
 			delete v;
 			return true;
 		}
@@ -372,7 +353,7 @@ void Graph<T>::getfloydWarshallPathAux(int index1, int index2, vector<T> & res)
 
 
 template<class T>
-int Graph<T>::edgeCost(int vOrigIndex, int vDestIndex)
+double Graph<T>::edgeCost(int vOrigIndex, int vDestIndex)
 {
 	if(vertexSet[vOrigIndex] == vertexSet[vDestIndex])
 		return 0;
@@ -390,11 +371,11 @@ int Graph<T>::edgeCost(int vOrigIndex, int vDestIndex)
 template<class T>
 void Graph<T>::floydWarshallShortestPath() {
 
-	W = new int * [vertexSet.size()];
+	W = new double * [vertexSet.size()];
 	P = new int * [vertexSet.size()];
 	for(unsigned int i = 0; i < vertexSet.size(); i++)
 	{
-		W[i] = new int[vertexSet.size()];
+		W[i] = new double[vertexSet.size()];
 		P[i] = new int[vertexSet.size()];
 		for(unsigned int j = 0; j < vertexSet.size(); j++)
 		{
@@ -412,7 +393,7 @@ void Graph<T>::floydWarshallShortestPath() {
 				if(W[i][k] == INT_INFINITY || W[k][j] == INT_INFINITY)
 					continue;
 
-				int val = min ( W[i][j], W[i][k]+W[k][j] );
+				double val = min ( W[i][j], W[i][k]+W[k][j] );
 				if(val != W[i][j])
 				{
 					W[i][j] = val;
@@ -467,6 +448,126 @@ vector<T> Graph<T>::knapsack(unsigned int maxTime, T& src){
 		}
 		return retorno;
 }
+template<class T>
+void Graph<T>::rowReduction(double ** costP, double &bound){
+	cout << bound << "row" << endl;
+	for(size_t i = 0; i < vertexSet.size(); i++){
+		double rmin = INT_INFINITY;
+		for (size_t j = 0; j < vertexSet.size(); j++){
+			if (i != j && costP[i][j] < rmin){
+				rmin = costP[i][j];
+			}
+		}
+		for (size_t j = 0; j < vertexSet.size(); j++){
+			if (costP[i][j] != INT_INFINITY)
+				costP[i][j] -= rmin;
+		}
+		if (rmin != INT_INFINITY){
+			bound += rmin;
+		}
+	}
+	cout << bound << endl;
+}
+template<class T>
+void Graph<T>::columReduction(double ** costP, double &bound){
+	cout << bound << "column"<< endl;
+	for (size_t j = 0; j < vertexSet.size(); j++){
+		double cmin = INT_INFINITY;
+		for (size_t i = 0; i < vertexSet.size(); i++){
+			if (i != j && costP[i][j] < cmin){
+				cmin = costP[i][j];
+			}
+		}
+		for (size_t i = 0; i < vertexSet.size(); i++){
+			if (costP[i][j] != INT_INFINITY)
+				costP[i][j] -= cmin;
+		}
+		if (cmin != INT_INFINITY){
+			bound += cmin;
+		}
+	}
+	cout << bound << endl;
+}
+template<class T>
+void Graph<T>::startMaxBound(){
+	maxBound = 0;
+	for (size_t j = 0; j < vertexSet.size(); j++){
+		double max = 0;
+		for (size_t i = 0; i < vertexSet.size(); i++){
+			if (cost[i][j] != INT_INFINITY && cost[i][j] > max){
+				max = cost[i][j];
+			}
+		}
+		maxBound += max;
+	}
+}
+template<class T>
+double Graph<T>::bb_aux(int src, int dst, string path, double ** cost2, double bound2){
+	double newBound = bound2;
+	int choosen = -1;
+	double ** costP = new double*[getNumVertex()];
+	for (size_t i = 0; i < vertexSet.size(); i++){
+		costP[i] = new double[getNumVertex()];
+		for (size_t j = 0; j < vertexSet.size(); j++)
+		{
+			costP[i][j] = cost2[i][j];
+		}
+	}
 
+	for (size_t i = 0; i < vertexSet.size(); i++){
+		costP[src][i] = INT_INFINITY;
+		costP[i][dst] = INT_INFINITY;
+	}
+	costP[dst][src] = INT_INFINITY;
+	rowReduction(costP, newBound);
+	columReduction(costP, newBound);
+	for (size_t j = 0; j < vertexSet.size(); j++){
+		if (costP[dst][j] != INT_INFINITY){
+			double boundP = bb_aux(dst, j, path + to_string(j) + "-", costP, newBound);
+			if (boundP <= newBound)
+			{
+				newBound = boundP;
+				choosen = j;
+			}
+		}
+	}
+	if (choosen == -1){
+		cout << path << " " << newBound << endl;
+	}
+	return newBound;
+}
+template<class T>
+vector<Vertex<T>*> Graph<T>::BB_TSP(){
+	cost = new double*[getNumVertex()];
+	double bound = 0;
+	
+	string path;
+	vector<Vertex<T>*> caminho;
+
+	for (size_t i = 0; i < vertexSet.size(); i++){
+		cost[i] = new double[getNumVertex()];
+		for (size_t j = 0; j < vertexSet.size(); j++)
+		{
+			cost[i][j] = edgeCost(i, j);
+			if (cost[i][j] == 0)
+			{
+				cost[i][j] = INT_INFINITY;
+			}
+		}
+	}
+	startMaxBound();
+	rowReduction(cost,bound);
+	columReduction(cost,bound);
+	path = to_string(0) + "-";
+	double newBound;
+	for (size_t j = 0; j < vertexSet.size(); j++)
+	{
+		if (cost[0][j] != INT_INFINITY){
+			newBound = bb_aux(0, j, path + to_string(j) + "-", cost, bound);
+		}
+	}
+
+	return caminho;
+}
 
 #endif /* GRAPH_H_ */

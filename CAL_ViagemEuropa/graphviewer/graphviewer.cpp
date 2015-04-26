@@ -1,6 +1,6 @@
 #include "graphviewer.h"
 #include <string>
-#include<sstream>
+#include <sstream>
 
 
 

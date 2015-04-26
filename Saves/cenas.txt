@@ -2,3 +2,8 @@ Porto 41.1495 -8.61077 9 183
 Braga 41.5511 -8.428 6 602
 Lisboa 38.7131 -9.13801 9 2400
 Coimbra 40.211 -8.42921 6 184
+#
+Porto Lisboa 3.30222
+Porto Braga 0.808056
+Braga Coimbra 1.9175
+Lisboa Coimbra 2.15333

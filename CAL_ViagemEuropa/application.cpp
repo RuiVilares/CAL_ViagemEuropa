@@ -71,8 +71,8 @@ void Application::addConnection(){
 		int time = getTravelDuration(cities.getVertexSet()[citySource]->getInfo().getLat(), cities.getVertexSet()[citySource]->getInfo().getLon(), cities.getVertexSet()[cityDestination]->getInfo().getLat(), cities.getVertexSet()[cityDestination]->getInfo().getLon());
 		int hour;
 		double min;
-		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], (double)time/60.0);
-		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], (double)time/60.0);
+		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], (double)time/3600.0);
+		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], (double)time/3600.0);
 		gv->addEdge(lastEdge,citySource, cityDestination, EdgeType::UNDIRECTED);
 		hour = time / 3600;
 		min = time % 3600;
@@ -230,8 +230,9 @@ void Application::main()
 			//launch();
 		}
 		else if (command == 'e'){
-			// Branch and Bound
-			launch();
+			cities.BB_TSP();
+			system("pause");
+			//launch();
 		}
 		else if (command == 'f'){
 			saveCities();
@@ -304,8 +305,8 @@ void Application::loadCities(){
 		}
 		stringstream ss;
 		string line = "", name, src, dst;
-		double lat, lon;
-		int pleasure, time, duration;
+		double lat, lon, duration;
+		int pleasure, time;
 		while (!myfile.eof() && line !="#")
 		{
 			ss.clear();
@@ -345,9 +346,9 @@ void Application::loadCities(){
 					cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], duration);
 					cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], duration);
 					gv->addEdge(lastEdge, citySource, cityDestination, EdgeType::UNDIRECTED);
-					hour = duration / 3600;
-					min = duration % 3600;
-					min = (min / 3600) * 60;
+					hour = duration;
+					min = duration - hour;
+					min *= 60;
 					gv->setEdgeLabel(lastEdge, to_string(hour) + ":" + to_string(int(min)));
 					gv->rearrange();
 					lastEdge++;
