@@ -231,6 +231,12 @@ void Application::main()
 		}
 		else if (command == 'e'){
 			cities.BB_TSP();
+			if (cities.getHamiltonPath() == ""){
+				cout << "There is no hamilton cycleo" << endl;
+			}
+			else{
+				cout << cities.getHamiltonPath() << endl;
+			}
 			system("pause");
 			//launch();
 		}

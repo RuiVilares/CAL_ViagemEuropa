@@ -171,6 +171,8 @@ public:
 	void rowReduction(double ** costP, double &bound);
 	void columReduction(double ** costP, double &bound);
 	void BB_TSP();
+	string getHamiltonPath();
+	double getTotalCost();
 	vector<T> knapsack(unsigned int maxTime, T &src);
 
 	void floydWarshallShortestPath();
@@ -535,8 +537,9 @@ double Graph<T>::bb_aux(int src, int dst, string path, double ** cost2, double b
 	if (choosen == -1){
 		if (path.size() == (getNumVertex() + 1) * 2 && newBound < totalCost){
 			hamiltonPath = path;
+			hamiltonPath.resize(hamiltonPath.size()-1);
 			totalCost = newBound;
-			cout << hamiltonPath;
+			cout << hamiltonPath << endl;
 		}
 	}
 	return newBound;
@@ -573,6 +576,14 @@ void Graph<T>::BB_TSP(){
 			bound -= cost[0][j];
 		}
 	}
+}
+template<class T>
+string Graph<T>::getHamiltonPath(){
+	return hamiltonPath;
+}
+template<class T>
+double Graph<T>::getTotalCost(){
+	return totalCost;
 }
 
 #endif /* GRAPH_H_ */
