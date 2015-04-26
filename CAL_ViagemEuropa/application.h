@@ -16,6 +16,7 @@ class Application{
 private:
 	Graph<City> cities;
 	GraphViewer *gv;
+	GraphViewer *result;
 	int lastNode;
 	int lastEdge;
 public:
@@ -30,7 +31,7 @@ public:
 	void start();
 	void main();
 	void limitedTimeRoute();
-	//void showFiles();
+	void swapHome();
 	void saveCities();
 	void loadCities();
 	void launch();

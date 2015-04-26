@@ -5,7 +5,6 @@ Interface *Application::iface = new Interface();
 
 Application::Application(){
 	gv = new GraphViewer(1200, 600, false);
-	//gv->setBackground("Europe.jpg");
 	gv->createWindow(1200, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
@@ -15,7 +14,6 @@ Application::Application(){
 }
 
 
-// implementar comparador ==
 void Application::addCity(){
 	string name;
 	int pleasure=-1, hours=-1, minutes=-1;
@@ -180,35 +178,27 @@ void Application::start(){
 void Application::limitedTimeRoute(){
 	string name;
 	TopMenu("MAXIMIZE PLEASURE");
-	iface->drawString("Home city name: ");
-	iface->read(name);
-	City city("nulo", 0, 0, 0);
-	for (size_t i = 0; i < cities.getNumVertex(); i++)
-	{
-		if (cities.getVertexSet()[i]->getInfo().getName() == name)
-		{
-			city = cities.getVertexSet()[i]->getInfo();
-		}
-	}
 	int inputTime;
 	double totalTime;
 	iface->drawString("Total time: ");
 	iface->read(inputTime);
 	int time = inputTime;
+	int totalPleasure = 0;
 	cities.floydWarshallShortestPath();
 	vector<int > route;
 	do{
-		if (city.getName() != "nulo"){
-			cities.knapsack(inputTime, city);
-			route = cities.getKnapsackSolution(time);
-		}
+		cities.knapsack(inputTime);
+		route = cities.getKnapsackSolution(time);
+
 		totalTime = 0;
+		
 		totalTime += cities.getCityTime(route);
 		for (size_t i = 0; i < route.size() -1; i++)
 		{
-			
+			totalPleasure += cities.getVertexSet()[i]->getInfo().getPleasure();
 			totalTime += cities.getW(route[i], route[i+1]);
 		}
+		totalPleasure += cities.getVertexSet()[route.size() - 1]->getInfo().getPleasure();
 		if (totalTime >(double)inputTime){
 			time--;
 		}
@@ -216,16 +206,26 @@ void Application::limitedTimeRoute(){
 			break;
 		}
 	} while (1);
-	for (size_t i = 0; i < route.size(); i++)
-	{
-		if (i != route.size() - 1)
-			cout << route[i] << "-";
-		else
-			cout << route[i];
-		
+	iface->drawString("Totla Pleasure: " + to_string(totalPleasure) + "\n\n");
+	result = new GraphViewer(1200, 600, false);
+	result->defineVertexColor("green");
+	result->defineEdgeColor("green");
+	result->createWindow(1200, 600);
+	result->addNode(0, calcX(cities.getVertexSet()[0]->getInfo().getLon()), calcY(cities.getVertexSet()[0]->getInfo().getLat()));
+	result->setVertexLabel(0, cities.getVertexSet()[0]->getInfo().getName());
+	for (size_t i = 0; i < route.size() - 1; i++){
+		result->addNode(i + 1, calcX(cities.getVertexSet()[route[i + 1]]->getInfo().getLon()), calcY(cities.getVertexSet()[route[i + 1]]->getInfo().getLat()));
+		result->setVertexLabel(i + 1, cities.getVertexSet()[route[i + 1]]->getInfo().getName());
+		result->addEdge(i, i, i + 1, EdgeType::UNDIRECTED);
+		result->setEdgeLabel(i, to_string(i + 1));
+		result->setEdgeThickness(i, 5);
 	}
-	cout << endl << endl;
-	system("pause");
+	result->addEdge(route.size(), 0, route.size() - 1, EdgeType::UNDIRECTED);
+	result->setEdgeLabel(route.size(), to_string(route.size()));
+	result->setEdgeThickness(route.size(), 5);
+	result->rearrange();
+	iface->getInput();
+	result->closeWindow();
 }
 
 
@@ -241,6 +241,7 @@ void Application::main()
 		iface->drawString("e. Ideal route\n");
 		iface->drawString("f. Save cities\n");
 		iface->drawString("g. Add conection\n");
+		iface->drawString("h. Swap Home City\n");
 		iface->drawString("q. Quit(!)\n\n");
 		iface->drawString("   > ");
 		iface->readChar(command);
@@ -255,11 +256,9 @@ void Application::main()
 		}
 		else if (command == 'd') {
 			limitedTimeRoute();
-			//launch();
 		}
 		else if (command == 'e'){
 			idealRoute();
-			//launch();
 		}
 		else if (command == 'f'){
 			saveCities();
@@ -267,12 +266,30 @@ void Application::main()
 		else if (command == 'g'){
 			addConnection();
 		}
+		else if (command == 'h'){
+			swapHome();
+		}
 		else if (command == 'q'){
 			return;
 		}
 	}
 }
-
+void Application::swapHome(){
+	TopMenu("SWAP HOME CITY");
+	iface->drawString("Enter new home city: ");
+	string name;
+	iface->readLine(name);
+	for (size_t i = 0; i < cities.getNumVertex(); i++)
+	{
+		if (cities.getVertexSet()[i]->getInfo().getName() == name){
+			cities.swap(0, i);
+			return;
+		}
+	}
+	iface->drawString("City not found!!!");
+	iface->getInput();
+	
+}
 void Application::saveCities(){
 	while (1){
 		string file;
@@ -416,22 +433,50 @@ int Application::calcY(double lat){
 void Application::idealRoute(){
 	cities.BB_TSP();
 	TopMenu("IDEAL ROUTE");
-	if (cities.getHamiltonPath() == ""){
-		cout << "There is no hamilton cycleo" << endl;
+	string path = cities.getHamiltonPath();
+	if (path == ""){
+		iface->drawString("There is no hamilton cycleo \n");
+		iface->getInput();
+		return;
 	}
 	else{
-		cout << cities.getHamiltonPath() << endl << endl; // print in a new graph viewer  
 		double totalTime = cities.getTotalCost();
 		for (size_t i = 1; i < cities.getNumVertex(); i++){
 			int hours = cities.getVertexSet()[i]->getInfo().getTimeInHours();
 			double minutes = (cities.getVertexSet()[i]->getInfo().getTimeInHours() - (double)hours) * 60.0;
-			cout << "Time in " << cities.getVertexSet()[i]->getInfo().getName() << ": " << hours << "h" << minutes << endl;
+			iface->drawString("Time in " + cities.getVertexSet()[i]->getInfo().getName() + ": " + to_string(hours) + "h" + to_string(minutes) + "\n");
 			totalTime += cities.getVertexSet()[i]->getInfo().getTimeInHours();
 		}
 		int totalhours = totalTime;
 		double totalminutes = (totalTime - (double)totalhours)*60.0;
 		int totalM = (int)totalminutes;
-		cout << endl << "Total time including all car trips: " << totalhours << "h" << totalM << endl;
+		iface->drawString("Total time including all car trips: " + to_string(totalhours) + "h" + to_string(totalM) + "\n");
 	}
-	system("pause");
+	result = new GraphViewer(1200, 600, false);
+	result->createWindow(1200, 600);
+	result->defineVertexColor("green");
+	result->defineEdgeColor("green");
+	result->addNode(0, calcX(cities.getVertexSet()[0]->getInfo().getLon()), calcY(cities.getVertexSet()[0]->getInfo().getLat()));
+	result->setVertexLabel(0, cities.getVertexSet()[0]->getInfo().getName());
+	int j = 1;
+	string index;
+	
+	int indexNode;
+	for (size_t i = 2; i < path.length() -2; i+=2){
+		index[0] = path[i];
+		indexNode = stoi(index);
+		result->addNode(j, calcX(cities.getVertexSet()[indexNode]->getInfo().getLon()), calcY(cities.getVertexSet()[indexNode]->getInfo().getLat()));
+		result->setVertexLabel(j, cities.getVertexSet()[indexNode]->getInfo().getName());
+		result->addEdge(j-1, j-1, j, EdgeType::UNDIRECTED);
+		result->setEdgeLabel(j-1, to_string(j));
+		result->setEdgeThickness(j - 1, 5);
+		j++;
+	}
+	result->addEdge(j - 1, j - 1, 0, EdgeType::UNDIRECTED);
+	result->setEdgeLabel(j - 1, to_string(j));
+	result->setEdgeThickness(j - 1, 5);
+	result->rearrange();
+	iface->getInput();
+	result->closeWindow();
+
 }

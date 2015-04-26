@@ -175,7 +175,7 @@ public:
 	void BB_TSP();
 	string getHamiltonPath();
 	double getTotalCost();
-	void knapsack(unsigned int maxTime, T &src);
+	void knapsack(unsigned int maxTime);
 	vector<int> getKnapsackSolution(unsigned int maxTime);
 
 
@@ -184,6 +184,8 @@ public:
 	double edgeCost(int vOrigIndex, int vDestIndex);
 	vector<T> getfloydWarshallPath(const T &origin, const T &dest);
 	void getfloydWarshallPathAux(int index1, int index2, vector<T> & res);
+
+	void swap(int i, int j);
 };
 
 
@@ -415,7 +417,8 @@ void Graph<T>::floydWarshallShortestPath() {
 nedds to be a city graph or the type has to have the methods getTimeInHours() and getPleasure()
 */
 template <class T>
-void Graph<T>::knapsack(unsigned int maxTime, T& src){
+void Graph<T>::knapsack(unsigned int maxTime){
+		T src = vertexSet[0]->getInfo();
 		if (maxTime == 0){
 			return;
 		}
@@ -596,6 +599,12 @@ double Graph<T>::getCityTime(const vector<int> &city){
 template<class T>
 double Graph<T>::getW(int i, int j){
 	return W[i][j];
+}
+template<class T>
+void Graph<T>::swap(int i, int j){
+	Vertex<T> * v1= vertexSet[i];
+	vertexSet[i] = vertexSet[j];
+	vertexSet[j] = v1;
 }
 
 #endif /* GRAPH_H_ */
