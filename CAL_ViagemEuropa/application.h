@@ -16,6 +16,7 @@ class Application{
 private:
 	Graph<City> cities;
 	GraphViewer *gv;
+	GraphViewer *result;
 	int lastNode;
 	int lastEdge;
 public:

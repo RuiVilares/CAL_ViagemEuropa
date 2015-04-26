@@ -5,7 +5,6 @@ Interface *Application::iface = new Interface();
 
 Application::Application(){
 	gv = new GraphViewer(1200, 600, false);
-	//gv->setBackground("Europe.jpg");
 	gv->createWindow(1200, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
@@ -222,11 +221,22 @@ void Application::main()
 			vector<City > route;
 			if (city.getName() != "nulo")
 				route = cities.knapsack(totalTime, city);
+			result = new GraphViewer(1200, 600, false);
+			result->createWindow(1200, 600);
+			result->addNode(0, calcX(city.getLon()), calcY(city.getLat()));
+			result->setVertexLabel(0, city.getName());
 			for (size_t i = 0; i < route.size(); i++){
+				result->addNode(i+1, calcX(route[i].getLon()), calcY(route[i].getLat()));
+				result->setVertexLabel(i+1, route[i].getName());
+				result->addEdge(i, i, i+1, EdgeType::UNDIRECTED);
+				result->setEdgeLabel(i, to_string(i + 1));
 				iface->drawString(route[i].getName());
 				iface->drawString("\n");
 			}
-			system("pause");
+			result->addEdge(route.size(), 0, route.size(), EdgeType::UNDIRECTED);
+			result->setEdgeLabel(route.size(), to_string(route.size()+1));
+			result->rearrange();
+			iface->getInput();
 			//launch();
 		}
 		else if (command == 'e'){
