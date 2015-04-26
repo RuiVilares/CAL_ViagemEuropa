@@ -167,16 +167,19 @@ public:
 	Vertex<T>* getVertex(const T &v) const;
 	vector<T> getPath(const T &origin, const T &dest);
 
+	double getCityTime(const vector<int> &city);
+
 	double bb_aux(int src, int dst, string path, double ** cost2, double bound);
-	void startMaxBound();
 	void rowReduction(double ** costP, double &bound);
 	void columReduction(double ** costP, double &bound);
 	void BB_TSP();
 	string getHamiltonPath();
 	double getTotalCost();
 	void knapsack(unsigned int maxTime, T &src);
-	vector<T> getKnapsackSolution(unsigned int maxTime);
+	vector<int> getKnapsackSolution(unsigned int maxTime);
 
+
+	double getW(int i, int j);
 	void floydWarshallShortestPath();
 	double edgeCost(int vOrigIndex, int vDestIndex);
 	vector<T> getfloydWarshallPath(const T &origin, const T &dest);
@@ -443,19 +446,21 @@ void Graph<T>::knapsack(unsigned int maxTime, T& src){
 
 }
 template<class T>
-vector<T> Graph<T>::getKnapsackSolution(unsigned int maxTime){
-	vector<T> retorno;
+vector<int> Graph<T>::getKnapsackSolution(unsigned int maxTime){
+	vector<int> retorno;
+	retorno.push_back(0);
 	int i = getNumVertex();
 	int k = maxTime;
 	while (i > 0 && k > 0){
 		if (totalP[i][k] != totalP[i - 1][k]){
-			retorno.push_back(vertexSet[i - 1]->getInfo());
+			retorno.push_back(i-1);
 			k -= round(vertexSet[i - 1]->getInfo().getTimeInHours());
 			i--;
 		}
 		else
 			i--;
 	}
+	retorno.push_back(0);
 	return retorno;
 }
 template<class T>
@@ -495,20 +500,10 @@ void Graph<T>::columReduction(double ** costP, double &bound){
 	}
 }
 template<class T>
-void Graph<T>::startMaxBound(){
-	maxBound = 0;
-	for (size_t j = 0; j < vertexSet.size(); j++){
-		double max = 0;
-		for (size_t i = 0; i < vertexSet.size(); i++){
-			if (cost[i][j] != INT_INFINITY && cost[i][j] > max){
-				max = cost[i][j];
-			}
-		}
-		maxBound += max;
-	}
-}
-template<class T>
 double Graph<T>::bb_aux(int src, int dst, string path, double ** cost2, double bound2){
+	if (bound2 > totalCost){
+		return INT_INFINITY;
+	}
 	double newBound = bound2;
 	int choosen = -1;
 	double ** costP = new double*[getNumVertex()];
@@ -568,7 +563,6 @@ void Graph<T>::BB_TSP(){
 			}
 		}
 	}
-	startMaxBound();
 	rowReduction(cost,bound);
 	columReduction(cost,bound);
 	path = to_string(0) + "-";
@@ -589,6 +583,19 @@ string Graph<T>::getHamiltonPath(){
 template<class T>
 double Graph<T>::getTotalCost(){
 	return totalCost;
+}
+template<class T>
+double Graph<T>::getCityTime(const vector<int> &city){
+	double total = 0;
+	for (size_t i = 0; i < city.size(); i++)
+	{
+		total += vertexSet[city[i]]->getInfo().getTimeInHours();
+	}
+	return total;
+}
+template<class T>
+double Graph<T>::getW(int i, int j){
+	return W[i][j];
 }
 
 #endif /* GRAPH_H_ */
