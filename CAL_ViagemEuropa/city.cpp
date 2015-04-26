@@ -55,3 +55,9 @@ bool City::operator ==(const City city){
 	else
 		return false;
 }
+void City::setIndex(int newIndex){
+	index = newIndex;
+}
+int City::getIndex(){
+	return index;
+}

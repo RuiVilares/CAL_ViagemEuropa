@@ -38,8 +38,9 @@ void Application::addCity(){
 		iface->drawString("\n\n\tCity didn't found");
 	else
 	{
+		city.setIndex(lastNode);
 		cities.addVertex(city);
-		gv->addNode(lastNode, calcX(city.getLon()), calcY(city.getLat()));
+		gv->addNode(city.getIndex(), calcX(city.getLon()), calcY(city.getLat()));
 		gv->setVertexLabel(lastNode, city.getName());
 		gv->rearrange();
 		lastNode++;
@@ -71,7 +72,7 @@ void Application::addConnection(){
 		double min;
 		cities.getVertexSet()[citySource]->addEdge(cities.getVertexSet()[cityDestination], (double)time/3600.0);
 		cities.getVertexSet()[cityDestination]->addEdge(cities.getVertexSet()[citySource], (double)time/3600.0);
-		gv->addEdge(lastEdge,citySource, cityDestination, EdgeType::UNDIRECTED);
+		gv->addEdge(lastEdge, cities.getVertexSet()[citySource]->getInfo().getIndex(), cities.getVertexSet()[cityDestination]->getInfo().getIndex(), EdgeType::UNDIRECTED);
 		hour = time / 3600;
 		min = time % 3600;
 		min = (min / 3600) * 60;
@@ -101,6 +102,7 @@ void Application::removeCity(){
 		else if (command > 0 && command <= cities.getNumVertex()){
 			TopMenu("REMOVE CITY");
 			iface->drawString("\n\n\n" + cities.getVertexSet()[command-1]->getInfo().getName() + " was sucefully removed!!!\n");
+			gv->removeNode(cities.getVertexSet()[command - 1]->getInfo().getIndex());
 			cities.removeVertex(cities.getVertexSet()[command - 1]->getInfo());
 			iface->getInput();
 		}
@@ -358,8 +360,10 @@ void Application::loadCities(){
 			if (line != "" && line != "#"){
 				ss << line;
 				ss >> name >> lat >> lon >> pleasure >> time;
-				cities.addVertex(City(name, lat, lon, pleasure, time));
-				gv->addNode(lastNode, calcX(lon), calcY(lat));
+				City cidade(name, lat, lon, pleasure, time);
+				cidade.setIndex(lastNode);
+				cities.addVertex(cidade);
+				gv->addNode(cidade.getIndex(), calcX(lon), calcY(lat));
 				gv->setVertexLabel(lastNode, name);
 				gv->rearrange();
 				lastNode++;

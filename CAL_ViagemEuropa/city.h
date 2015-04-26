@@ -11,6 +11,7 @@ class City{
 		double lon;
 		int pleasure;
 		int time;
+		int index;
 	
 	public:
 		City(string name, int pleasure, int hours, int minutes);
@@ -20,6 +21,8 @@ class City{
 		double getLon();
 		int getPleasure();
 		int getTime();
+		void setIndex(int newIndex);
+		int getIndex();
 		double getTimeInHours();
 		bool operator <(const City city);
 		bool operator ==(const City city);
