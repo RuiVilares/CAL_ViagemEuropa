@@ -145,9 +145,12 @@ class Graph {
 	//floydWarshall variables
 	double ** W;   //weight
 	int ** P;   //path
+
 	//Branch and bound variables;
 	double ** cost;
 	double maxBound;
+	double totalCost;
+	string hamiltonPath;
 
 public:
 	bool addVertex(const T &in);
@@ -167,7 +170,7 @@ public:
 	void startMaxBound();
 	void rowReduction(double ** costP, double &bound);
 	void columReduction(double ** costP, double &bound);
-	vector<Vertex<T>*> BB_TSP();
+	void BB_TSP();
 	vector<T> knapsack(unsigned int maxTime, T &src);
 
 	void floydWarshallShortestPath();
@@ -450,7 +453,6 @@ vector<T> Graph<T>::knapsack(unsigned int maxTime, T& src){
 }
 template<class T>
 void Graph<T>::rowReduction(double ** costP, double &bound){
-	cout << bound << "row" << endl;
 	for(size_t i = 0; i < vertexSet.size(); i++){
 		double rmin = INT_INFINITY;
 		for (size_t j = 0; j < vertexSet.size(); j++){
@@ -466,11 +468,9 @@ void Graph<T>::rowReduction(double ** costP, double &bound){
 			bound += rmin;
 		}
 	}
-	cout << bound << endl;
 }
 template<class T>
 void Graph<T>::columReduction(double ** costP, double &bound){
-	cout << bound << "column"<< endl;
 	for (size_t j = 0; j < vertexSet.size(); j++){
 		double cmin = INT_INFINITY;
 		for (size_t i = 0; i < vertexSet.size(); i++){
@@ -486,7 +486,6 @@ void Graph<T>::columReduction(double ** costP, double &bound){
 			bound += cmin;
 		}
 	}
-	cout << bound << endl;
 }
 template<class T>
 void Graph<T>::startMaxBound(){
@@ -523,26 +522,32 @@ double Graph<T>::bb_aux(int src, int dst, string path, double ** cost2, double b
 	columReduction(costP, newBound);
 	for (size_t j = 0; j < vertexSet.size(); j++){
 		if (costP[dst][j] != INT_INFINITY){
+			newBound += costP[dst][j];
 			double boundP = bb_aux(dst, j, path + to_string(j) + "-", costP, newBound);
 			if (boundP <= newBound)
 			{
 				newBound = boundP;
 				choosen = j;
 			}
+			newBound -= costP[dst][j];
 		}
 	}
 	if (choosen == -1){
-		cout << path << " " << newBound << endl;
+		if (path.size() == (getNumVertex() + 1) * 2 && newBound < totalCost){
+			hamiltonPath = path;
+			totalCost = newBound;
+			cout << hamiltonPath;
+		}
 	}
 	return newBound;
 }
 template<class T>
-vector<Vertex<T>*> Graph<T>::BB_TSP(){
+void Graph<T>::BB_TSP(){
 	cost = new double*[getNumVertex()];
 	double bound = 0;
+	totalCost = INT_INFINITY;
 	
 	string path;
-	vector<Vertex<T>*> caminho;
 
 	for (size_t i = 0; i < vertexSet.size(); i++){
 		cost[i] = new double[getNumVertex()];
@@ -563,11 +568,11 @@ vector<Vertex<T>*> Graph<T>::BB_TSP(){
 	for (size_t j = 0; j < vertexSet.size(); j++)
 	{
 		if (cost[0][j] != INT_INFINITY){
+			bound += cost[0][j];
 			newBound = bb_aux(0, j, path + to_string(j) + "-", cost, bound);
+			bound -= cost[0][j];
 		}
 	}
-
-	return caminho;
 }
 
 #endif /* GRAPH_H_ */
