@@ -198,7 +198,8 @@ void Application::limitedTimeRoute(){
 		for (size_t i = 0; i < route.size() - 1; i++)
 		{
 			totalPleasure += cities.getVertexSet()[route[i+1]]->getInfo().getPleasure();
-			totalTime += cities.getW(route[i], route[i+1]);
+			double time = cities.getW(route[i], route[i + 1]);
+			totalTime += time;
 		}
 		totalPleasure -= cities.getVertexSet()[route[route.size() - 1]]->getInfo().getPleasure();
 		if (totalTime >(double)inputTime){
@@ -209,6 +210,19 @@ void Application::limitedTimeRoute(){
 		}
 	} while (1);
 	iface->drawString("Total Pleasure: " + to_string(totalPleasure) + "\n\n");
+
+	for (size_t i = 0; i < route.size() - 1; i++)
+	{
+		double time = cities.getW(route[i], route[i + 1]);
+		iface->drawString("\n \n " + cities.getVertexSet()[route[i]]->getInfo().getName() + "-" + cities.getVertexSet()[route[i + 1]]->getInfo().getName() + ": ");
+		iface->drawString(to_string((int)time) + "h" + to_string((int)((time - (double)(int)time) * 60)));
+		double timeCity = cities.getVertexSet()[route[i + 1]]->getInfo().getTimeInHours();
+		if (i != route.size() - 2){
+			iface->drawString("\n \n " + cities.getVertexSet()[route[i + 1]]->getInfo().getName() + ": ");
+			iface->drawString(to_string((int)timeCity) + "h" + to_string((int)((timeCity - (double)(int)timeCity) * 60)));
+		}
+	}
+	
 	result = new GraphViewer(1200, 600, false);
 	result->defineVertexColor("green");
 	result->defineEdgeColor("green");
