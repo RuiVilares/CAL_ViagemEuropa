@@ -14,7 +14,9 @@
 #include <stdlib.h>
 #endif
 
-
+/**Class with terminal configurations
+*
+*/
 class Interface{
 public:
 
@@ -92,5 +94,7 @@ template<typename Type>
 void Interface::drawString(Type STRING){
 	std::cout << STRING;
 }
+
+/** @} */
 
 #endif

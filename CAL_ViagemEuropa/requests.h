@@ -49,3 +49,5 @@ void getLatLong(string const &name, double &lat, double &lon);
 * @return int with car travel duration in seconds
 */
 int getTravelDuration(double const &latSrc, double const &lonSrc, double const &latDst, double const &lonDst);
+
+/** @} */

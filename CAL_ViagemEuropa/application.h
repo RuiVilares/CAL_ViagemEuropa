@@ -17,6 +17,9 @@
 
 using namespace std;
 
+/**Represents main program
+*
+*/
 class Application{
 private:
 	Graph<City> cities; // Graph with cities configuration 
@@ -126,3 +129,5 @@ public:
 	*/
 	int calcY(double lat);
 };
+
+/** @} */
