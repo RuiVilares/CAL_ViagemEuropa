@@ -479,6 +479,7 @@ void Application::idealRoute(){
 		indexNode = stoi(index);
 		index[0] = path[i+2];
 		indexNode2 = stoi(index);
+		double time = cities.edgeCost(indexNode, indexNode2);
 		iface->drawString("\n \n " + cities.getVertexSet()[indexNode]->getInfo().getName() + "-" + cities.getVertexSet()[indexNode2]->getInfo().getName() + ": ");
 		iface->drawString(to_string((int)time) + "h" + to_string((int)((time - (double)(int)time) * 60)));
 	}
