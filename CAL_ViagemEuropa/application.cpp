@@ -181,26 +181,27 @@ void Application::limitedTimeRoute(){
 	string name;
 	TopMenu("MAXIMIZE PLEASURE");
 	int inputTime;
-	double totalTime;
-	iface->drawString("Total time: ");
+	double totalTime; 
+	iface->drawString("Total time (in hours): ");
 	iface->read(inputTime);
 	int time = inputTime;
-	int totalPleasure = 0;
+	int totalPleasure;
 	cities.floydWarshallShortestPath();
 	vector<int > route;
+	cities.knapsack(inputTime);
 	do{
-		cities.knapsack(inputTime);
 		route = cities.getKnapsackSolution(time);
 
+		totalPleasure = 0;
 		totalTime = 0;
 		
 		totalTime += cities.getCityTime(route);
-		for (size_t i = 0; i < route.size() -1; i++)
+		for (size_t i = 0; i < route.size() - 1; i++)
 		{
-			totalPleasure += cities.getVertexSet()[i]->getInfo().getPleasure();
+			totalPleasure += cities.getVertexSet()[route[i+1]]->getInfo().getPleasure();
 			totalTime += cities.getW(route[i], route[i+1]);
 		}
-		totalPleasure += cities.getVertexSet()[route.size() - 1]->getInfo().getPleasure();
+		totalPleasure -= cities.getVertexSet()[route[route.size() - 1]]->getInfo().getPleasure();
 		if (totalTime >(double)inputTime){
 			time--;
 		}
@@ -208,7 +209,7 @@ void Application::limitedTimeRoute(){
 			break;
 		}
 	} while (1);
-	iface->drawString("Totla Pleasure: " + to_string(totalPleasure) + "\n\n");
+	iface->drawString("Total Pleasure: " + to_string(totalPleasure) + "\n\n");
 	result = new GraphViewer(1200, 600, false);
 	result->defineVertexColor("green");
 	result->defineEdgeColor("green");
@@ -448,7 +449,7 @@ void Application::idealRoute(){
 		for (size_t i = 1; i < cities.getNumVertex(); i++){
 			int hours = cities.getVertexSet()[i]->getInfo().getTimeInHours();
 			double minutes = (cities.getVertexSet()[i]->getInfo().getTimeInHours() - (double)hours) * 60.0;
-			iface->drawString("Time in " + cities.getVertexSet()[i]->getInfo().getName() + ": " + to_string(hours) + "h" + to_string(minutes) + "\n");
+			iface->drawString("Time in " + cities.getVertexSet()[i]->getInfo().getName() + ": " + to_string(hours) + "h" + to_string((int)minutes) + "\n");
 			totalTime += cities.getVertexSet()[i]->getInfo().getTimeInHours();
 		}
 		int totalhours = totalTime;

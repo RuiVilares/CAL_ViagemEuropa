@@ -463,6 +463,7 @@ vector<int> Graph<T>::getKnapsackSolution(unsigned int maxTime){
 		else
 			i--;
 	}
+
 	retorno.push_back(0);
 	return retorno;
 }
