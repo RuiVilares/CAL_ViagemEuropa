@@ -17,19 +17,46 @@
 #include <cmath>
 using namespace std;
 
+
+/**Class that represents a edge.
+*
+*/
 template <class T> class Edge;
+
+/**Class that represents a graph
+*
+*/
 template <class T> class Graph;
 
+/**
+*Global variable used in graph manipulation
+*/
 const int NOT_VISITED = 0;
+
+/**
+*Global variable used in graph manipulation
+*/
 const int BEING_VISITED = 1;
+
+/**
+*Global variable used in graph manipulation
+*/
 const int DONE_VISITED = 2;
-const int INT_INFINITY = INT_MAX;
+
+/**
+*Global variable used in graph manipulation
+*/
+const int INT_INFINITY = INT_MAX; 
 
 /*
  * ================================================================================================
  * Class Vertex
  * ================================================================================================
  */
+
+/**Represents vertexes (cities)
+*
+*/
 template <class T>
 class Vertex {
 	T info; // City information
@@ -145,6 +172,10 @@ void Vertex<T>::setInfo(T info) {
  * Class Edge
  * ================================================================================================
  */
+
+/**Class edge definition 
+*
+*/
 template <class T>
 class Edge {
 	Vertex<T> * dest; // Vertex destination
@@ -824,5 +855,7 @@ void Graph<T>::swap(int i, int j){
 	vertexSet[i] = vertexSet[j];
 	vertexSet[j] = v1;
 }
+
+/** @} */
 
 #endif /* GRAPH_H_ */

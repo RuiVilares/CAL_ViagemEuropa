@@ -9,6 +9,9 @@
 
 using namespace std;
 
+/**Represents cities
+*
+*/
 class City{
 	private:
 		string name; // represents city name
@@ -112,3 +115,5 @@ class City{
 		*/
 		bool operator ==(const City city);
 };
+
+/** @} */
