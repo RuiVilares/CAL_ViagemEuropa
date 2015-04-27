@@ -407,6 +407,7 @@ nedds to be a city graph or the type has to have the methods getTimeInHours() an
 */
 template <class T>
 void Graph<T>::knapsack(unsigned int maxTime){
+		floydWarshallShortestPath();
 		T src = vertexSet[0]->getInfo();
 		if (maxTime == 0){
 			return;
@@ -421,8 +422,10 @@ void Graph<T>::knapsack(unsigned int maxTime){
 
 
 		for (size_t i = 1; i <= vertexSet.size(); i++){
+			double time = vertexSet[i - 1]->getInfo().getTimeInHours();
+			time += 2 * W[0][i - 1];
 			for (size_t j = 0; j <= maxTime; j++){
-				if (!(src == vertexSet[i - 1]->getInfo()) && vertexSet[i - 1]->getInfo().getTimeInHours() < (double)j){
+				if (!(src == vertexSet[i - 1]->getInfo()) && time < (double)j){
 					int index = (j - round(vertexSet[i - 1]->getInfo().getTimeInHours()));
 					int pleasure = vertexSet[i - 1]->getInfo().getPleasure() + totalP[i - 1][index];
 					if (totalP[i - 1][j] >= pleasure)
@@ -580,7 +583,7 @@ double Graph<T>::getTotalCost(){
 template<class T>
 double Graph<T>::getCityTime(const vector<int> &city){
 	double total = 0;
-	for (size_t i = 0; i < city.size(); i++)
+	for (size_t i = 1; i < city.size()-1; i++)
 	{
 		total += vertexSet[city[i]]->getInfo().getTimeInHours();
 	}

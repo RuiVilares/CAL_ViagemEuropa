@@ -186,7 +186,6 @@ void Application::limitedTimeRoute(){
 	iface->read(inputTime);
 	int time = inputTime;
 	int totalPleasure;
-	cities.floydWarshallShortestPath();
 	vector<int > route;
 	cities.knapsack(inputTime);
 	do{
