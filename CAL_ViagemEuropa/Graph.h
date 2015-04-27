@@ -4,6 +4,11 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
+/** @defgroup Graph Graph
+* @{
+* Functions for graph configuration
+*/
+
 #include <vector>
 #include <algorithm>   
 #include <queue>
@@ -27,24 +32,65 @@ const int INT_INFINITY = INT_MAX;
  */
 template <class T>
 class Vertex {
-	T info;
-	vector<Edge<T>  > adj;
+	T info; // City information
+	vector<Edge<T>  > adj; // Vector with adjacent edges
 public:
-
+	/**
+	* @brief Vertex constructor
+	*/
 	Vertex(T in);
 	friend class Graph<T>;
 
+	/**
+	* @brief Function to add a edge
+	*
+	* @param dest Vertex destination
+	* @param w Vertex weight  
+	*/
 	void addEdge(Vertex<T> *dest, double w);
+
+	/**
+	* @brief Remove edge
+	*
+	* @param d Vertex destination
+	* @return Boolean validation 
+	*/
 	bool removeEdgeTo(Vertex<T> *d);
 
+	/**
+	* @brief Get vertex info
+	*
+	* @return City information
+	*/
 	T getInfo() const;
+
+	/**
+	* @brief Set vertex info
+	*
+	* @param info City information
+	*/
 	void setInfo(T info);
 
+	/**
+	* @brief Get adjacent edges
+	*
+	* @return Vector with adjacent edges
+	*/
 	vector<Edge<T>> getAdj();
 
-
+	/**
+	* @brief Operator < overloading
+	*
+	* @param vertex Vertex to compare
+	* @return boolean answer
+	*/
 	bool operator<(const Vertex<T> vertex);
 
+	/**
+	* @brief Vertex path
+	*
+	* @return Vertex pointer
+	*/
 	Vertex* path;
 };
 
@@ -101,11 +147,30 @@ void Vertex<T>::setInfo(T info) {
  */
 template <class T>
 class Edge {
-	Vertex<T> * dest;
-	double weight;
+	Vertex<T> * dest; // Vertex destination
+	double weight; // Edge weight
 public:
+	
+	/**
+	* @brief Edge construtor
+	*
+	* @param d Vertex destination
+	* @param w edge weight
+	*/
 	Edge(Vertex<T> *d, double w);
+
+	/**
+	* @brief Get vertex destination 
+	*
+	* @return Vertex
+	*/
 	Vertex<T>* getDest();
+
+	/**
+	* @brief Get edge weight
+	*
+	* @return edge weight
+	*/
 	double getWeight();
 	friend class Graph<T>;
 	friend class Vertex<T>;
@@ -132,48 +197,208 @@ double Edge<T>::getWeight(){
  */
 template <class T>
 class Graph {
-	vector<Vertex<T> *> vertexSet;
+	vector<Vertex<T> *> vertexSet; // vector with vertexes
 	
 	//floydWarshall variables
 	double ** W;   //weight
 	int ** P;   //path
 
 	//Branch and bound variables;
-	int** totalP;
-	double ** cost;
-	double maxBound;
-	double totalCost;
-	string hamiltonPath;
+	int** totalP; // Total pleausure
+	double ** cost; // Cost 
+	double maxBound; // Maximum bound
+	double totalCost; // Total cost
+	string hamiltonPath; // Hamilton path
 
 public:
+
+	/**
+	* @brief Add vertex to the vector 
+	*
+	* @param in vertex to add
+	* @return boolean answer
+	*/
 	bool addVertex(const T &in);
+	
+	/**
+	* @brief Add edge between sourc and dest
+	*
+	* @param sourc Source vertex
+	* @param dest Destination vertex
+	* @param w edge weight
+	* @return boolean answer
+	*/
 	bool addEdge(const T &sourc, const T &dest, double w);
+
+	/**
+	* @brief Remove vertex
+	*
+	* @param in Vertex to remove
+	* @return boolean answer
+	*/
 	bool removeVertex(const T &in);
+
+	/**
+	* @brief Remove edge between two vertexes
+	*
+	* @param sourc Source vertex
+	* @param dest Destination vertex
+	* @return boolean answer
+	*/
 	bool removeEdge(const T &sourc, const T &dest);
+
+	/**
+	* @brief Get vertexes vector
+	*
+	* @return vertexes vector
+	*/
 	vector<Vertex<T> * > getVertexSet() const;
+
+	/**
+	* @brief Get number of vertexes
+	*
+	* @return number of vertexes
+	*/
 	int getNumVertex() const;
 
+	/**
+	* @brief Get a specific vertex
+	*
+	* @param v vertex
+	* @return Specific vertex
+	*/
 	Vertex<T>* getVertex(const T &v) const;
+
+	/**
+	* @brief Get a path
+	*
+	* @param origin Origin vertex
+	* @param dest Destination vertex
+	* @return Vector with vertexes in the path
+	*/
 	vector<T> getPath(const T &origin, const T &dest);
 
+
+	/**
+	* @brief Get cities total time
+	*
+	* @param city Indexes cities vector 
+	* @return Total time in every cities
+	*/
 	double getCityTime(const vector<int> &city);
 
+
+	/**
+	* @brief Branch and bound auxiliary function
+	*
+	* @param src Source index
+	* @param dst Destination index
+	* @param path Hamilton Path
+	* @param cost2 Cost
+	* @param bound Bound
+	* @return auxiliary solution
+	*/
 	double bb_aux(int src, int dst, string path, double ** cost2, double bound);
+
+	/**
+	* @brief Matrix row reduction
+	*
+	* @param costP Cost
+	* @param bound Bound
+	*/
 	void rowReduction(double ** costP, double &bound);
+
+	/**
+	* @brief Matrix colum reduction
+	*
+	* @param costP Cost
+	* @param bound Bound
+	*/
 	void columReduction(double ** costP, double &bound);
+
+	/**
+	* @brief Branch and Bound algorithm 
+	*
+	*/
 	void BB_TSP();
+
+	/**
+	* @brief Get Hamilton Path
+	*
+	* @return string with the solution
+	*/
 	string getHamiltonPath();
+
+	/**
+	* @brief Get total cost
+	*
+	* @return Total cost
+	*/
 	double getTotalCost();
+
+	/**
+	* @brief Knapsack Algorithm
+	*
+	* @param maxTime max available time
+	*/
 	void knapsack(unsigned int maxTime);
+
+	/**
+	* @brief Knapsack Solution
+	*
+	* @param maxTime max available time
+	* @return Vector with vertex index solution
+	*/
 	vector<int> getKnapsackSolution(unsigned int maxTime);
 
-
+	/**
+	* @brief Get edge weight
+	*
+	* @param i vertex index
+	* @param j vertex index
+	* @return Edge weigth 
+	*/
 	double getW(int i, int j);
+
+	/**
+	* @brief Floyd-Warshall Algorithm
+	*
+	*/
 	void floydWarshallShortestPath();
+
+	/**
+	* @brief Edge cost
+	*
+	* @param vOrigIndex origin vertex index
+	* @param vDestIndex destination vertex index
+	* @return Edge cost
+	*/
 	double edgeCost(int vOrigIndex, int vDestIndex);
+
+	/**
+	* @brief Get Floyd-Warshall Path
+	*
+	* @param origin origin vertex
+	* @param dest destination vertex
+	* @return Vector with vertexes in the path
+	*/
 	vector<T> getfloydWarshallPath(const T &origin, const T &dest);
+
+	/**
+	* @brief Floyd-Warshall Path auxiliary  function
+	*
+	* @param index1 origin vertex index
+	* @param index2 destination index
+	* @param res destination Vector with vertexes
+	*/
 	void getfloydWarshallPathAux(int index1, int index2, vector<T> & res);
 
+	/**
+	* @brief Swap two indices
+	*
+	* @param i vertex index
+	* @param j vertex index
+	*/
 	void swap(int i, int j);
 };
 
