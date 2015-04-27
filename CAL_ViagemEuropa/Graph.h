@@ -50,14 +50,6 @@ public:
 
 
 template <class T>
-struct vertex_greater_than {
-    bool operator()(Vertex<T> * a, Vertex<T> * b) const {
-        return a->getDist() > b->getDist();
-    }
-};
-
-
-template <class T>
 bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
 	typename vector<Edge<T> >::iterator it= adj.begin();
 	typename vector<Edge<T> >::iterator ite= adj.end();
@@ -158,9 +150,6 @@ public:
 	bool addEdge(const T &sourc, const T &dest, double w);
 	bool removeVertex(const T &in);
 	bool removeEdge(const T &sourc, const T &dest);
-	vector<T> dfs() const;
-	vector<T> bfs(Vertex<T> *v) const;
-	int maxNewChildren(Vertex<T> *v, T &inf) const;
 	vector<Vertex<T> * > getVertexSet() const;
 	int getNumVertex() const;
 
