@@ -1,22 +1,7 @@
-Porto 41.1495 -8.61077 5 18300
-Paris 48.8565 2.35213 5 18300
-Londres 51.5073 -0.127647 5 18300
-Moscovo 55.4792 37.3273 5 18300
-Istambul 41.0096 28.9652 5 18300
-Berlim 52.517 13.3889 5 18300
-Estocolmo 59.3251 18.0711 5 18300
-Roma 41.8933 12.4831 5 18300
-#
-Porto Paris 51360
-Porto Londres 67197
-Porto Roma 78444
-Paris Berlim 37464
-Paris Londres 16185
-Paris Estocolmo 63633
-Londres Berlim 39508
-Londres Estocolmo 65676
-Moscovo Berlim 64164
-Moscovo Estocolmo 56782
-Moscovo Roma 107517
-Berlim Roma 52108
-Berlim Estocolmo 40511
+Porto 41.1495 -8.61077 5 1440
+Paris 48.8565 2.35213 5 1440
+Londres 51.5073 -0.127647 5 1440
+Moscovo 55.4792 37.3273 5 1440
+Berlim 52.517 13.3889 5 1440
+Estocolmo 59.3251 18.0711 5 1440
+Roma 41.8933 12.4831 5 1440
