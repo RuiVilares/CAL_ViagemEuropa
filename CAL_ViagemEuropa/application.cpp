@@ -209,6 +209,7 @@ void Application::limitedTimeRoute(){
 			break;
 		}
 	} while (1);
+
 	iface->drawString("Total Pleasure: " + to_string(totalPleasure) + "\n\n");
 
 	for (size_t i = 0; i < route.size() - 1; i++)
@@ -453,7 +454,7 @@ void Application::idealRoute(){
 	TopMenu("IDEAL ROUTE");
 	string path = cities.getHamiltonPath();
 	if (path == ""){
-		iface->drawString("There is no hamilton cycleo \n");
+		iface->drawString("There is no hamilton cycle \n");
 		iface->getInput();
 		return;
 	}
@@ -470,6 +471,17 @@ void Application::idealRoute(){
 		int totalM = (int)totalminutes;
 		iface->drawString("Total time including all car trips: " + to_string(totalhours) + "h" + to_string(totalM) + "\n");
 	}
+	string index;
+	int indexNode;
+	int indexNode2;
+	for (size_t i = 0; i < path.length() - 2; i += 2){
+		index[0] = path[i];
+		indexNode = stoi(index);
+		index[0] = path[i+2];
+		indexNode2 = stoi(index);
+		iface->drawString("\n \n " + cities.getVertexSet()[indexNode]->getInfo().getName() + "-" + cities.getVertexSet()[indexNode2]->getInfo().getName() + ": ");
+		iface->drawString(to_string((int)time) + "h" + to_string((int)((time - (double)(int)time) * 60)));
+	}
 	result = new GraphViewer(1200, 600, false);
 	result->createWindow(1200, 600);
 	result->defineVertexColor("green");
@@ -477,9 +489,6 @@ void Application::idealRoute(){
 	result->addNode(0, calcX(cities.getVertexSet()[0]->getInfo().getLon()), calcY(cities.getVertexSet()[0]->getInfo().getLat()));
 	result->setVertexLabel(0, cities.getVertexSet()[0]->getInfo().getName());
 	int j = 1;
-	string index;
-	
-	int indexNode;
 	for (size_t i = 2; i < path.length() -2; i+=2){
 		index[0] = path[i];
 		indexNode = stoi(index);
